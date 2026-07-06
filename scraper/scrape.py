@@ -378,6 +378,13 @@ def main() -> int:
             entry["status"] = "OK"
             report["sets"].append(entry)
 
+            # Dédoublonnage par id (card_number_version_set_id) : le DOM Bandai
+            # peut lister deux fois la même variante ; on garde la dernière.
+            deduped = list({c["id"]: c for c in cards}.values())
+            if len(deduped) < len(cards):
+                log.warning("%s : %d doublon(s) d'id supprimé(s)", sid, len(cards) - len(deduped))
+                cards = deduped
+
             if sb:
                 set_row = {
                     "set_id": sid,

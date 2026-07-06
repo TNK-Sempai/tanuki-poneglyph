@@ -27,11 +27,15 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(REPO_ROOT / ".env")  # secrets locaux ; sans effet en CI (env déjà présent)
+
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
 log = logging.getLogger("poneglyph.build")
 
 SCHEMA_VERSION = "1.0"
-REPO_ROOT = Path(__file__).resolve().parent.parent
 DIST = REPO_ROOT / "dist"
 IMAGES_SRC = REPO_ROOT / "images"
 WORKER_DATA = REPO_ROOT / "worker" / "data"
