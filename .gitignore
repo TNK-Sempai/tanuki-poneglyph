@@ -1,0 +1,25 @@
+# Secrets — JAMAIS de vraies valeurs commitées
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node / Worker
+node_modules/
+worker/.wrangler/
+worker/data/*.json
+
+# Build (généré par build/generate.py, déployé sur Cloudflare Pages)
+dist/
+
+# Rapports scraper
+scraper/report.json
+
+# OS / IDE
+.DS_Store
+Thumbs.db

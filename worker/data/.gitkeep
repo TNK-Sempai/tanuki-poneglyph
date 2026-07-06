@@ -1,0 +1,2 @@
+# Les fichiers cards.json / sets.json / filters.json de ce dossier sont
+# générés par build/generate.py avant chaque deploy (gitignorés).

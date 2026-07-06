@@ -1,0 +1,10 @@
+name = "poneglyph-api"
+main = "src/index.ts"
+compatibility_date = "2026-07-01"
+
+# Route sur le domaine public (zone Cloudflare tanuki-corporation.com).
+# Le Worker intercepte /v1/* et laisse passer les fichiers statiques vers Pages.
+# Décommenter une fois le DNS de poneglyph.tanuki-corporation.com configuré :
+# routes = [
+#   { pattern = "poneglyph.tanuki-corporation.com/v1/*", zone_name = "tanuki-corporation.com" }
+# ]
