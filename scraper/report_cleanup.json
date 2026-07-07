@@ -1,0 +1,329 @@
+{
+  "mode": "audit (dry-run)",
+  "origin_cutoff": "2026-07-07T02:05:26.814692+00:00",
+  "before": {
+    "total_cards": 3499,
+    "bandai_rows": 2620,
+    "opecards_rows": 879,
+    "total_sets": 40,
+    "duplicates": 0,
+    "reassignments": 0,
+    "ambiguous": 26,
+    "set_renames": 0,
+    "empty_sets": 0,
+    "orphan_images": 0
+  },
+  "empty_sets": [],
+  "delete": [],
+  "reassign": [],
+  "ambiguous": [
+    {
+      "id": "PRB02-006_sp_parallele_OP14",
+      "card_number": "PRB02-006",
+      "version": "SP Parallèle",
+      "set_id": "OP14",
+      "bandai_sets": [
+        "OP14-EB04",
+        "PRB02"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP12-030_sp_parallele_OP14",
+      "card_number": "OP12-030",
+      "version": "SP Parallèle",
+      "set_id": "OP14",
+      "bandai_sets": [
+        "OP12",
+        "OP14-EB04"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP09-051_sp_parallele_OP14",
+      "card_number": "OP09-051",
+      "version": "SP Parallèle",
+      "set_id": "OP14",
+      "bandai_sets": [
+        "OP09",
+        "OP14-EB04",
+        "ST25"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP09-051_sp_parallele_gold_OP14",
+      "card_number": "OP09-051",
+      "version": "SP Parallèle Gold",
+      "set_id": "OP14",
+      "bandai_sets": [
+        "OP09",
+        "OP14-EB04",
+        "ST25"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP10-065_sp_parallele_OP14",
+      "card_number": "OP10-065",
+      "version": "SP Parallèle",
+      "set_id": "OP14",
+      "bandai_sets": [
+        "OP10",
+        "OP14-EB04"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP14-084_version_2_OP14",
+      "card_number": "OP14-084",
+      "version": "Version 2",
+      "set_id": "OP14",
+      "bandai_sets": [
+        "OP14-EB04",
+        "OP16"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP12-113_treasure_rare_OP14",
+      "card_number": "OP12-113",
+      "version": "Treasure Rare",
+      "set_id": "OP14",
+      "bandai_sets": [
+        "OP12",
+        "OP14-EB04"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP09-004_sp_parallele_gold_OP13",
+      "card_number": "OP09-004",
+      "set_id": "OP13",
+      "version": "SP Parallèle Gold",
+      "candidates_bandai": [
+        {
+          "id": "OP09-004_alternative_art_4_OP13",
+          "version": "Alternative Art 4",
+          "rarity": "SP CARD"
+        },
+        {
+          "id": "OP09-004_alternative_art_5_OP13",
+          "version": "Alternative Art 5",
+          "rarity": "SP CARD"
+        }
+      ],
+      "reason": "plusieurs variants SP dans le groupe — arbitrage manuel"
+    },
+    {
+      "id": "OP09-004_sp_parallele_silver_OP13",
+      "card_number": "OP09-004",
+      "set_id": "OP13",
+      "version": "SP Parallèle Silver",
+      "candidates_bandai": [
+        {
+          "id": "OP09-004_alternative_art_4_OP13",
+          "version": "Alternative Art 4",
+          "rarity": "SP CARD"
+        },
+        {
+          "id": "OP09-004_alternative_art_5_OP13",
+          "version": "Alternative Art 5",
+          "rarity": "SP CARD"
+        }
+      ],
+      "reason": "plusieurs variants SP dans le groupe — arbitrage manuel"
+    },
+    {
+      "id": "OP07-019_standard_OP07",
+      "card_number": "OP07-019",
+      "version": "Standard",
+      "set_id": "OP07",
+      "bandai_sets": [
+        "EB02",
+        "ST24"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "EB01-015_pack_de_tournoi_2025_vol_2_EB01",
+      "card_number": "EB01-015",
+      "version": "Pack de Tournoi 2025 Vol.2",
+      "set_id": "EB01",
+      "bandai_sets": [
+        "PRB02",
+        "PROMO",
+        "ST24"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "EB01-015_pack_winner_2025_vol_2_EB01",
+      "card_number": "EB01-015",
+      "version": "Pack Winner 2025 Vol.2",
+      "set_id": "EB01",
+      "bandai_sets": [
+        "PRB02",
+        "PROMO",
+        "ST24"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "ST04-005_dash_pack_vol_1_ST04",
+      "card_number": "ST04-005",
+      "version": "Dash Pack Vol.1",
+      "set_id": "ST04",
+      "bandai_sets": [
+        "PRB01",
+        "PROMO"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "ST02-007_dash_pack_vol_1_ST02",
+      "card_number": "ST02-007",
+      "version": "Dash Pack Vol.1",
+      "set_id": "ST02",
+      "bandai_sets": [
+        "PRB02",
+        "PROMO"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP07-040_pack_d_evenement_de_sortie_st_15_st_20_OP07",
+      "card_number": "OP07-040",
+      "version": "Pack d'Événement de Sortie ST-15～ST-20",
+      "set_id": "OP07",
+      "bandai_sets": [
+        "PRB02",
+        "PROMO"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP07-040_pack_winner_d_evenement_de_sortie_st_15_st_20_OP07",
+      "card_number": "OP07-040",
+      "version": "Pack Winner d'Événement de Sortie ST-15～ST-20",
+      "set_id": "OP07",
+      "bandai_sets": [
+        "PRB02",
+        "PROMO"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP03-044_dash_pack_vol_1_OP03",
+      "card_number": "OP03-044",
+      "version": "Dash Pack Vol.1",
+      "set_id": "OP03",
+      "bandai_sets": [
+        "PRB02",
+        "PROMO"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP03-116_pack_d_evenement_de_sortie_st_15_st_20_OP03",
+      "card_number": "OP03-116",
+      "version": "Pack d'Événement de Sortie ST-15～ST-20",
+      "set_id": "OP03",
+      "bandai_sets": [
+        "PRB01",
+        "PROMO"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP03-116_pack_winner_d_evenement_de_sortie_st_15_st_20_OP03",
+      "card_number": "OP03-116",
+      "version": "Pack Winner d'Événement de Sortie ST-15～ST-20",
+      "set_id": "OP03",
+      "bandai_sets": [
+        "PRB01",
+        "PROMO"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP06-047_pack_de_tournoi_2025_vol_1_OP06",
+      "card_number": "OP06-047",
+      "version": "Pack de Tournoi 2025 Vol.1",
+      "set_id": "OP06",
+      "bandai_sets": [
+        "PRB02",
+        "PROMO"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP06-047_pack_winner_2025_vol_1_OP06",
+      "card_number": "OP06-047",
+      "version": "Pack Winner 2025 Vol.1",
+      "set_id": "OP06",
+      "bandai_sets": [
+        "PRB02",
+        "PROMO"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP06-076_pack_de_tournoi_2025_vol_1_OP06",
+      "card_number": "OP06-076",
+      "version": "Pack de Tournoi 2025 Vol.1",
+      "set_id": "OP06",
+      "bandai_sets": [
+        "PRB02",
+        "PROMO"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP06-076_pack_winner_2025_vol_1_OP06",
+      "card_number": "OP06-076",
+      "version": "Pack Winner 2025 Vol.1",
+      "set_id": "OP06",
+      "bandai_sets": [
+        "PRB02",
+        "PROMO"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP05-037_pack_de_bienvenue_vol_1_OP05",
+      "card_number": "OP05-037",
+      "version": "Pack de Bienvenue Vol.1",
+      "set_id": "OP05",
+      "bandai_sets": [
+        "PRB02",
+        "PROMO"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP05-076_pack_de_bienvenue_vol_1_OP05",
+      "card_number": "OP05-076",
+      "version": "Pack de Bienvenue Vol.1",
+      "set_id": "OP05",
+      "bandai_sets": [
+        "PROMO",
+        "ST18"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    },
+    {
+      "id": "OP06-115_pack_de_bienvenue_vol_1_OP06",
+      "card_number": "OP06-115",
+      "version": "Pack de Bienvenue Vol.1",
+      "set_id": "OP06",
+      "bandai_sets": [
+        "PRB02",
+        "PROMO"
+      ],
+      "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+    }
+  ],
+  "set_renames": [],
+  "orphan_images": []
+}

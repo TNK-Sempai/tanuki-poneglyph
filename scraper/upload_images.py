@@ -27,19 +27,9 @@ HEADERS = {
 }
 
 
-def download_and_convert(url: str, dest: Path, force: bool = False) -> bool:
-    """Télécharge une image et l'écrit en WebP (quality 85, max 800px de large).
-
-    Retourne True si le fichier a été écrit, False s'il existait déjà.
-    Lève une exception en cas d'échec réseau ou de décodage.
-    """
-    if dest.exists() and not force:
-        return False
-
-    resp = requests.get(url, headers=HEADERS, timeout=30)
-    resp.raise_for_status()
-
-    img = Image.open(io.BytesIO(resp.content))
+def convert_and_save(data: bytes, dest: Path) -> None:
+    """Écrit des octets d'image en WebP (quality 85, max 800px de large)."""
+    img = Image.open(io.BytesIO(data))
     if img.mode not in ("RGB", "RGBA"):
         img = img.convert("RGB")
     if img.width > MAX_WIDTH:
@@ -51,4 +41,18 @@ def download_and_convert(url: str, dest: Path, force: bool = False) -> bool:
     img.save(tmp, "WEBP", quality=WEBP_QUALITY)
     tmp.replace(dest)
     log.info("image écrite : %s", dest.name)
+
+
+def download_and_convert(url: str, dest: Path, force: bool = False) -> bool:
+    """Télécharge une image et l'écrit en WebP (quality 85, max 800px de large).
+
+    Retourne True si le fichier a été écrit, False s'il existait déjà.
+    Lève une exception en cas d'échec réseau ou de décodage.
+    """
+    if dest.exists() and not force:
+        return False
+
+    resp = requests.get(url, headers=HEADERS, timeout=30)
+    resp.raise_for_status()
+    convert_and_save(resp.content, dest)
     return True

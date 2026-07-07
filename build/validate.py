@@ -41,6 +41,9 @@ def main() -> int:
     for c in cards:
         cid = c.get("id", "<sans id>")
         for f in REQUIRED_CARD_FIELDS:
+            # les DON!! n'ont pas d'identité de couleur (colors = [])
+            if f == "colors" and c.get("type") == "DON!!":
+                continue
             if c.get(f) in (None, "", []):
                 errors.append(f"{cid} : champ requis vide : {f}")
         if cid in seen_ids:

@@ -23,6 +23,7 @@ GitHub Issue en cas d'échec). Exit code 1 si la validation échoue.
 from __future__ import annotations
 
 import argparse
+import html
 import json
 import logging
 import os
@@ -105,7 +106,8 @@ def set_id_from_label(label: str, series_value: str) -> str:
     """Résout le set_id d'une série. Objectif : 100 % des séries FR scrapées.
 
     - "... [OP-16]" / "... [OP16]"      → "OP16"
-    - "... [OP15-EB04]" (composé)       → dernier code : "EB04"
+    - "... [OP15-EB04]" (composé)       → code complet : "OP15-EB04"
+      (deux séries [OP14-EB04] et [OP15-EB04] = deux sets distincts)
     - Carte promo (series=622901)       → "PROMO"
     - Carte d'autres produits (622801)  → "OTHER"
     - Sinon fallback "S{series_value}" (jamais de série ignorée)
@@ -117,8 +119,9 @@ def set_id_from_label(label: str, series_value: str) -> str:
     if m:
         codes = re.findall(r"([A-Z]+)[-‐]?(\d+)", m.group(1))
         if codes:
-            prefix, num = codes[-1]  # "[OP15-EB04]" → ("EB", "04")
-            return f"{prefix}{int(num):02d}"
+            # Chaque code est normalisé ("OP-16" → "OP16") ; un code composé
+            # garde toutes ses parties, jointes par un tiret.
+            return "-".join(f"{p}{int(n):02d}" for p, n in codes)
 
     # Pas de crochets exploitables : détection par mots-clés du libellé
     folded = unicodedata.normalize("NFKD", label).encode("ascii", "ignore").decode().lower()
@@ -134,6 +137,11 @@ def set_id_from_label(label: str, series_value: str) -> str:
 
 
 def set_type_from_id(set_id: str) -> str:
+    """"OP16" → "OP" ; pour un id composé "OP15-EB04", le produit FR est le
+    dernier code → "EB". "PROMO"/"OTHER" restent leur propre set_type."""
+    codes = re.findall(r"([A-Z]+)(?=\d)", set_id)
+    if codes:
+        return codes[-1]
     m = re.match(r"^([A-Z]+)", set_id)
     return m.group(1) if m else "AUTRE"
 
@@ -275,8 +283,18 @@ def get_series_list(page) -> list[dict]:
 
 
 def clean_set_name(label: str) -> str:
-    """Retire le suffixe "[OP-16]" du libellé pour obtenir le nom du set."""
-    return re.sub(r"\s*\[[^\]]+\]\s*$", "", label).strip(" -–—")
+    """Nettoie un libellé de série Bandai pour obtenir le nom du set.
+
+    Les libellés contiennent du HTML brut et des entités :
+      'BOOSTER <br class="spInline">-L&apos;HEURE DE LA BATAILLE DÉCISIVE- [OP-16]'
+      → 'BOOSTER - L'HEURE DE LA BATAILLE DÉCISIVE'
+    """
+    text = html.unescape(label)                                  # &apos; → '
+    text = BeautifulSoup(text, "html.parser").get_text(" ")     # <br ...> → espace
+    text = re.sub(r"\s*\[[^\]]+\]\s*$", "", text)                # suffixe [OP-16]
+    text = re.sub(r"\s+", " ", text).strip(" -–—")               # espaces + tirets bords
+    text = re.sub(r"\s-(?=\S)", " - ", text)                     # "R -SANG" → "R - SANG"
+    return text.strip()
 
 
 def scrape_series(page, serie: dict, skip_images: bool) -> list[dict]:
