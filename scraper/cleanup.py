@@ -273,6 +273,26 @@ def plan_card_actions(cards: list[dict]) -> dict:
     return {"delete": delete, "reassign": final_reassign, "ambiguous": ambiguous}
 
 
+def protect_locked(actions: dict, locked_ids: set) -> list[dict]:
+    """Retire du plan toute action delete/reassign CIBLANT une carte locked.
+
+    Mute `actions` en place (retire les entrées protégées de delete/reassign)
+    et retourne la liste des entrées protégées, chacune enrichie de "action".
+    Une carte locked qui n'est que la référence CONSERVÉE d'un doublon n'est
+    pas concernée : seule la ligne effectivement modifiée est protégée.
+    """
+    protected = []
+    for kind in ("delete", "reassign"):
+        kept = []
+        for a in actions[kind]:
+            if a["id"] in locked_ids:
+                protected.append({**a, "action": kind})
+            else:
+                kept.append(a)
+        actions[kind] = kept
+    return protected
+
+
 # ---------------------------------------------------------------------------
 
 def get_supabase():
@@ -300,15 +320,21 @@ def main() -> int:
     ap.add_argument("--apply", action="store_true",
                     help="applique les corrections (défaut : audit seul)")
     ap.add_argument("--cutoff", help="force le cutoff Bandai/opecards (ISO 8601)")
+    ap.add_argument("--only-ids", metavar="FICHIER",
+                    help="restreint les corrections aux ids validés à la main. Attend le JSON "
+                         "exporté par dashboard/cleanup-review.html (clé \"approved_ids\"), ou un "
+                         "simple tableau d'ids. Toute action hors de cette liste est ignorée.")
     args = ap.parse_args()
 
     sb = get_supabase()
     cards = fetch_all(
         sb, "poneglyph_cards",
-        "id,card_number,version,set_id,rarity,block_number,created_at,image_filename",
+        "id,card_number,version,set_id,rarity,locked,block_number,created_at,image_filename",
     )
     sets = fetch_all(sb, "poneglyph_sets", "set_id,name,set_type")
-    log.info("BDD : %d cartes, %d sets", len(cards), len(sets))
+    locked_ids = {c["id"] for c in cards if c.get("locked")}
+    log.info("BDD : %d cartes, %d sets, %d verrouillée(s) (locked)",
+             len(cards), len(sets), len(locked_ids))
 
     cutoff = datetime.fromisoformat(args.cutoff) if args.cutoff else detect_cutoff(cards)
     if cutoff is None:
@@ -321,6 +347,44 @@ def main() -> int:
              cutoff.isoformat(), n_bandai, len(cards) - n_bandai)
 
     actions = plan_card_actions(cards)
+
+    # Cartes verrouillées : jamais supprimées ni réassignées. Une action qui
+    # CIBLE une carte locked est retirée du plan et loggée comme "protégée".
+    protected = protect_locked(actions, locked_ids)
+    if protected:
+        log.info("%d carte(s) locked protégée(s) (exclues des corrections)", len(protected))
+        for p in protected:
+            log.info("  PROTÉGÉE %-45s (%s ignoré : %s)", p["id"], p["action"], p["reason"])
+
+    # Revue humaine : ne garder que les actions explicitement approuvées dans le
+    # dashboard. Tout ce qui n'est pas dans la liste est écarté du plan — les
+    # sets vides et images orphelines sont recalculés ensuite sur ce plan réduit.
+    approved_ids: set[str] | None = None
+    filtered_out: list[dict] = []
+    if args.only_ids:
+        raw = json.loads(Path(args.only_ids).read_text(encoding="utf-8"))
+        ids = raw if isinstance(raw, list) else raw.get("approved_ids", [])
+        approved_ids = set(ids)
+        if not approved_ids:
+            log.error("%s ne contient aucun id approuvé — rien à faire.", args.only_ids)
+            return 1
+        for kind in ("delete", "reassign"):
+            kept = []
+            for a in actions[kind]:
+                if a["id"] in approved_ids:
+                    kept.append(a)
+                else:
+                    filtered_out.append({**a, "action": kind})
+            actions[kind] = kept
+        log.info("revue humaine (%s) : %d id(s) approuvé(s) → %d suppression(s) et "
+                 "%d réassignation(s) retenues, %d action(s) écartée(s)",
+                 args.only_ids, len(approved_ids), len(actions["delete"]),
+                 len(actions["reassign"]), len(filtered_out))
+        inconnus = approved_ids - {a["id"] for a in actions["delete"] + actions["reassign"]}
+        if inconnus:
+            log.warning("%d id(s) approuvé(s) ne correspondent à aucune action du plan actuel "
+                        "(plan recalculé depuis un état de base différent ?) : %s",
+                        len(inconnus), ", ".join(sorted(inconnus)[:5]))
 
     # noms de sets à corriger
     set_renames = []
@@ -353,6 +417,12 @@ def main() -> int:
     report = {
         "mode": "apply" if args.apply else "audit (dry-run)",
         "origin_cutoff": cutoff.isoformat(),
+        "revue_humaine": None if approved_ids is None else {
+            "fichier": args.only_ids,
+            "ids_approuves": len(approved_ids),
+            "actions_retenues": len(actions["delete"]) + len(actions["reassign"]),
+            "actions_ecartees": len(filtered_out),
+        },
         "before": {
             "total_cards": len(cards),
             "bandai_rows": n_bandai,
@@ -364,19 +434,22 @@ def main() -> int:
             "set_renames": len(set_renames),
             "empty_sets": len(empty_sets),
             "orphan_images": len(orphan_images),
+            "locked_protected": len(protected),
         },
         "empty_sets": empty_sets,
         "delete": actions["delete"],
         "reassign": actions["reassign"],
         "ambiguous": actions["ambiguous"],
+        "protected": protected,
         "set_renames": set_renames,
         "orphan_images": orphan_images,
     }
 
     log.info("AUDIT : %d doublon(s) à supprimer, %d réassignation(s), %d ambigu(s), "
-             "%d set(s) à renommer, %d set(s) vide(s) à supprimer, %d image(s) orpheline(s)",
+             "%d set(s) à renommer, %d set(s) vide(s) à supprimer, %d image(s) orpheline(s), "
+             "%d carte(s) locked protégée(s)",
              len(actions["delete"]), len(actions["reassign"]), len(actions["ambiguous"]),
-             len(set_renames), len(empty_sets), len(orphan_images))
+             len(set_renames), len(empty_sets), len(orphan_images), len(protected))
     if empty_sets:
         log.info("  sets vides après corrections : %s", ", ".join(empty_sets))
     for d in actions["delete"]:

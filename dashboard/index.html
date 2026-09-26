@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home — Ponéglyphe</title>
+<link rel="stylesheet" href="/dashboard/tanuki.css">
+<script src="/dashboard/session.js" defer></script>
+<style>
+  main{max-width:1180px;margin:0 auto;padding:30px 22px 60px}
+  .lede{margin:0 0 30px;max-width:620px;color:var(--muted2);font-size:14.5px}
+  .lede .editorial{color:var(--text);font-size:17px}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);
+         border:1px solid var(--border);border-radius:3px;margin-bottom:34px}
+  .stat{background:var(--surface);padding:20px 18px 18px}
+  .stat .sub{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:5px;
+             letter-spacing:.06em}
+
+  .split{display:grid;grid-template-columns:1fr 340px;gap:26px;align-items:start}
+  .sec{margin-bottom:14px;display:flex;align-items:center;gap:11px}
+  .sec .line{flex:1;height:1px;background:var(--border)}
+
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+     text-transform:uppercase;color:var(--muted);font-weight:400;
+     padding:0 10px 8px;border-bottom:1px solid var(--border)}
+  th.r,td.r{text-align:right}
+  td{padding:9px 10px;border-bottom:1px solid var(--border);font-size:13.5px}
+  tr:hover td{background:var(--surface)}
+  td .code{font-family:var(--mono);font-size:12.5px;letter-spacing:.05em}
+  td .nm{color:var(--muted2);font-size:12.5px}
+  td .num{font-family:var(--mono);font-size:12.5px}
+  td .num b{color:var(--text);font-weight:400}
+  .bar{height:2px;background:var(--surface2);border-radius:0;overflow:hidden;
+       min-width:64px;margin-top:5px}
+  .bar i{display:block;height:100%;background:var(--accent)}
+  .bar i.over{background:var(--muted)}
+  .state{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+  .state.ok{color:var(--accent)}
+  .state.na{color:var(--muted)}
+  .state.gap{color:var(--text)}
+
+  .card{padding:18px}
+  .card .big{font-family:var(--display);font-size:52px;line-height:.9;color:var(--accent)}
+  .card p{color:var(--muted2);font-size:13px;margin:12px 0 16px}
+  .queue{display:flex;gap:18px;margin:14px 0 0}
+  .queue div{flex:1}
+  .queue .n{font-family:var(--display);font-size:27px;line-height:1}
+  @media(max-width:960px){.split{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">TANUKI</div>
+  <span class="meta" style="letter-spacing:.12em">/ OP-TCG API</span>
+  <span class="chip">Database</span>
+  <span class="grow"></span>
+  <div class="status"><span class="led"></span><span id="apiState">API online</span></div>
+  <span class="meta" id="stamp"></span>
+  <nav class="nav">
+    <a href="/dashboard/editor.html">01 / Editor</a>
+    <a href="/dashboard/cleanup-review.html">02 / Cleanup</a>
+    <a href="/dashboard/index.html" class="on">03 / Dashboard</a>
+    <a href="/dashboard/sets.html">04 / Sets</a>
+  </nav>
+  <button id="logout" class="ghost">Sortir</button>
+</div>
+
+<main>
+  <p class="lede"><span class="editorial">Base de contrôle.</span><br>
+     Chaque chiffre ci-dessous vient de la base, pas d'une estimation. Un écart n'est pas
+     une erreur : c'est un endroit à regarder.</p>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="split">
+    <section>
+      <div class="sec"><span class="label">Sets — les plus récents</span><span class="line"></span>
+        <a class="meta" href="/dashboard/editor.html">tout voir →</a></div>
+      <table>
+        <thead><tr><th>Set</th><th>Nom</th><th class="r">Base / attendu</th><th class="r">État</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </section>
+
+    <aside>
+      <div class="sec"><span class="label">File de cleanup</span><span class="line"></span></div>
+      <div class="panel card" id="cleanup"><div class="empty">…</div></div>
+    </aside>
+  </div>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c =>
+  ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function stat(n, k, sub, accent){
+  return `<div class="stat">
+    <div class="n display ${accent ? "accent" : ""}">${n}</div>
+    <div class="k label">${k}</div>
+    ${sub ? `<div class="sub">${sub}</div>` : ""}</div>`;
+}
+
+async function load(){
+  $("#stamp").textContent = new Date().toLocaleString("fr-FR");
+
+  const d = await fetch("/api/sets").then(r => r.json());
+  const sets = d.sets;
+
+  const connus = sets.filter(s => s.card_count != null);
+  const locked = sets.reduce((a,s) => a + s.cards_verrouillees, 0);
+  // Pas de "% de couverture" : la base contient des variantes que card_count
+  // (le compte Bandai par set) n'inclut pas, un ratio depasserait 100 % et ne
+  // voudrait rien dire. On compte les sets qui atteignent leur total attendu.
+  const complets = connus.filter(s => s.cards_en_base >= s.card_count).length;
+  const sous     = connus.length - complets;
+
+  $("#stats").innerHTML =
+    stat(sets.length, "Sets", `${sets.length - connus.length} sans total attendu`) +
+    stat(d.total_cartes, "Cartes en base", `${locked} verrouillée(s)`) +
+    stat(`${complets}<span style="color:var(--muted)">/${connus.length}</span>`,
+         "Sets au total attendu",
+         sous ? `${sous} set(s) en dessous du compte Bandai` : "aucun set en dessous", true) +
+    stat('<span id="qn">—</span>', "En attente de revue", "actions de cleanup");
+
+  const recents = [...sets].sort((a,b) =>
+    String(b.created_at || "").localeCompare(String(a.created_at || ""))).slice(0, 14);
+
+  $("#rows").innerHTML = recents.map(s => {
+    const known = s.card_count != null;
+    const ratio = known ? Math.min(s.cards_en_base / s.card_count, 1) : 0;
+    const etat = !known ? `<span class="state na">non chiffré</span>`
+      : s.cards_en_base === s.card_count ? `<span class="state ok">complet</span>`
+      : s.cards_en_base > s.card_count
+        ? `<span class="state gap">+${s.cards_en_base - s.card_count}</span>`
+        : `<span class="state gap">−${s.card_count - s.cards_en_base}</span>`;
+    return `<tr>
+      <td><span class="code">${esc(s.set_id)}</span></td>
+      <td><span class="nm">${esc(s.name)}</span></td>
+      <td class="r"><span class="num"><b>${s.cards_en_base}</b> / ${
+        known ? s.card_count : "—"}</span>
+        <div class="bar"><i class="${known && s.cards_en_base > s.card_count ? "over" : ""}"
+          style="width:${known ? Math.round(ratio*100) : 0}%"></i></div></td>
+      <td class="r">${etat}</td></tr>`;
+  }).join("");
+
+  // file de cleanup : lecture du rapport d'audit deja genere, aucun calcul ajoute
+  try{
+    const a = await fetch("/AUDIT-CLEANUP-DETAIL.json").then(r => r.json());
+    const t = a.totaux;
+    $("#qn").textContent = t.suppressions + t.reassignations;
+    $("#cleanup").innerHTML = `
+      <div class="big">${t.suppressions + t.reassignations}</div>
+      <div class="label">actions en attente</div>
+      <div class="queue">
+        <div><div class="n">${t.suppressions}</div><div class="label">suppressions</div></div>
+        <div><div class="n">${t.reassignations}</div><div class="label">réassignations</div></div>
+        <div><div class="n" style="color:var(--accent)">${
+          a.suppressions_a_risque.length}</div><div class="label">à vérifier</div></div>
+      </div>
+      <p>Rien n'est appliqué tant que vous n'avez pas approuvé chaque entrée.
+         ${t.ambigus_non_traites} cas ambigu(s) restent hors du plan.</p>
+      <a href="/dashboard/cleanup-review.html"><button class="primary">Ouvrir la revue →</button></a>`;
+  }catch(e){
+    $("#qn").textContent = "0";
+    $("#cleanup").innerHTML = `<div class="empty">Aucun audit en attente</div>`;
+  }
+}
+
+load().catch(e => {
+  $("#stats").innerHTML = `<div class="stat"><div class="k label">${esc(e.message)}</div>
+    <div class="sub">run python dashboard/server.py</div></div>`;
+});
+</script>
+</body>
+</html>

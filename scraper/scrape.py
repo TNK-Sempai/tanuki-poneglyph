@@ -344,6 +344,27 @@ def upsert(sb, table: str, rows: list[dict], on_conflict: str, chunk: int = 200)
         sb.table(table).upsert(rows[i : i + chunk], on_conflict=on_conflict).execute()
 
 
+def fetch_locked_ids(sb) -> set[str]:
+    """Ids des cartes verrouillées (locked=true) : jamais écrasées par le scraper.
+
+    Permet de corriger une carte à la main en BDD sans qu'un re-scrape ne la
+    réécrase."""
+    ids: set[str] = set()
+    offset, page = 0, 1000
+    while True:
+        res = (
+            sb.table("poneglyph_cards")
+            .select("id")
+            .eq("locked", True)
+            .range(offset, offset + page - 1)
+            .execute()
+        )
+        ids.update(r["id"] for r in res.data)
+        if len(res.data) < page:
+            return ids
+        offset += page
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="Scraper Bandai FR → Supabase")
     ap.add_argument("--series", help="valeur(s) de série à scraper, séparées par des virgules")
@@ -357,9 +378,13 @@ def main() -> int:
 
     # card_count attendus (déjà en BDD) pour la validation
     expected_counts: dict[str, int] = {}
+    locked_ids: set[str] = set()
     if sb:
         res = sb.table("poneglyph_sets").select("set_id,card_count").execute()
         expected_counts = {r["set_id"]: r["card_count"] for r in res.data if r.get("card_count")}
+        locked_ids = fetch_locked_ids(sb)
+        log.info("%d carte(s) verrouillée(s) (locked) protégée(s) de l'upsert", len(locked_ids))
+    total_locked_skipped = 0
 
     with sync_playwright() as pw:
         browser = pw.chromium.launch()
@@ -412,16 +437,26 @@ def main() -> int:
                 if sid not in expected_counts:
                     set_row["card_count"] = scraped
                 upsert(sb, "poneglyph_sets", [set_row], on_conflict="set_id")
-                upsert(sb, "poneglyph_cards", cards, on_conflict="card_number,version,set_id")
-                log.info("%s : %d cartes upsertées", sid, scraped)
+
+                # Exclure les cartes verrouillées : elles ont été corrigées à la
+                # main en BDD et ne doivent pas être réécrasées par le scraper.
+                to_upsert = [c for c in cards if c["id"] not in locked_ids]
+                n_locked = len(cards) - len(to_upsert)
+                total_locked_skipped += n_locked
+                if n_locked:
+                    log.info("%s : %d carte(s) locked skippée(s)", sid, n_locked)
+                upsert(sb, "poneglyph_cards", to_upsert, on_conflict="card_number,version,set_id")
+                log.info("%s : %d cartes upsertées", sid, len(to_upsert))
 
         browser.close()
 
+    report["locked_skipped"] = total_locked_skipped
     REPORT_PATH.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     if not report["ok"]:
         log.error("scraping terminé avec erreurs — pas de build. Voir %s", REPORT_PATH)
         return 1
-    log.info("scraping OK — %d set(s)", len(report["sets"]))
+    log.info("scraping OK — %d set(s), %d carte(s) locked protégée(s)",
+             len(report["sets"]), total_locked_skipped)
     return 0
 
 

@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Editor — Ponéglyphe</title>
+<link rel="stylesheet" href="/dashboard/tanuki.css">
+<script src="/dashboard/session.js" defer></script>
+<style>
+  body{height:100vh;display:flex;flex-direction:column;overflow:hidden}
+  .wrap{flex:1;display:grid;grid-template-columns:262px 1fr 372px;min-height:0}
+
+  /* ---- 01 / SETS ---- */
+  aside{border-right:1px solid var(--border);overflow-y:auto;background:var(--surface);
+        display:flex;flex-direction:column}
+  aside .cap{padding:14px 16px 10px;position:sticky;top:0;background:var(--surface);
+             border-bottom:1px solid var(--border);z-index:2}
+  aside .list{flex:1}
+  aside .s{padding:9px 14px;border-bottom:1px solid var(--border);cursor:pointer;
+           display:grid;grid-template-columns:26px 1fr auto;gap:9px;align-items:center}
+  aside .s:hover{background:var(--surface2)}
+  aside .s.on{background:var(--surface2);outline:1px solid var(--accent);outline-offset:-1px}
+  aside .s .idx{font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.06em}
+  aside .s.on .idx{color:var(--accent)}
+  aside .s .body{min-width:0}
+  aside .s .c{font-family:var(--mono);font-size:12px;letter-spacing:.07em;color:var(--text);
+              text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  aside .s .nmset{font-size:11px;color:var(--muted);line-height:1.3;margin-top:1px;
+                  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  aside .s.on .nmset{color:var(--muted2)}
+  aside .s .k{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:2px}
+  aside .s .k b{color:var(--muted2);font-weight:400}
+  aside .s .flag{font-family:var(--mono);font-size:11px;color:var(--muted);opacity:.7}
+  aside .s .flag.warn{color:var(--accent);opacity:1;font-weight:500}
+  aside .foot{padding:12px 14px;border-top:1px solid var(--border);position:sticky;bottom:0;
+              background:var(--surface)}
+  aside .foot button{width:100%}
+
+  /* ---- CARD GRID ---- */
+  main{overflow-y:auto;padding:16px 20px 40px;min-width:0}
+  .ghead{display:flex;align-items:flex-start;gap:16px;margin-bottom:12px;flex-wrap:wrap}
+  .ghead .sub{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em;
+              margin-top:6px;text-transform:uppercase}
+  .ghead .sub b{color:var(--text);font-weight:400}
+  .ghead .sub .ok{color:var(--accent)}
+
+  /* filtres */
+  .fbar{border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+        padding:8px 0;margin-bottom:12px}
+  .fgrp{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:3px 0}
+  .fgrp > .label{min-width:66px}
+  .fgrp button{border:0;border-bottom:1px solid transparent;border-radius:0;padding:3px 9px;
+               background:none;font-size:10.5px}
+  .fgrp button:before{content:"";display:inline-block;width:4px;height:4px;border-radius:50%;
+                      background:transparent;margin-right:6px;vertical-align:middle}
+  .fgrp button.on{color:var(--accent);border-bottom-color:var(--accent)}
+  .fgrp button.on:before{background:var(--accent)}
+  .fgrp button .n{color:var(--muted);margin-left:5px;font-size:9.5px}
+
+  /* barre de selection */
+  .selbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+          border:1px solid var(--accent);background:var(--accent-dim);
+          border-radius:2px;padding:9px 12px;margin-bottom:12px}
+  .selbar .n{font-family:var(--display);font-size:22px;color:var(--accent);line-height:1}
+  .selbar select{width:auto;min-width:150px;padding:5px 8px;font-size:12px}
+
+  /* pagination */
+  .pager{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:18px;
+         border-top:1px solid var(--border);padding-top:12px}
+  .pager .pg{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em}
+  .pager .pg b{color:var(--text);font-weight:400}
+  .pager select{width:auto;padding:4px 7px;font-size:11.5px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(146px,1fr));gap:12px}
+  .c{cursor:pointer;position:relative}
+  .c .shot{position:relative;overflow:hidden;border:1px solid var(--border);
+           background:#07070b;aspect-ratio:5/7}
+  .c img{width:100%;height:100%;object-fit:contain;display:block;transition:transform .18s ease}
+  .c:hover .shot{border-color:var(--accent)}
+  .c:hover img{transform:scale(1.04)}
+  .c.sel .shot{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+  .c.picked .shot{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+  .c .open{position:absolute;left:0;right:0;bottom:0;padding:6px 8px;text-align:right;
+           background:linear-gradient(to top,rgba(9,9,14,.95),rgba(9,9,14,0));
+           font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:var(--accent);
+           opacity:0;transition:opacity .14s}
+  .c:hover .open,.c.sel .open{opacity:1}
+  .c .pick{position:absolute;top:6px;left:6px;width:19px;height:19px;z-index:4;
+           border:1px solid var(--border-strong);background:rgba(9,9,14,.82);border-radius:2px;
+           display:flex;align-items:center;justify-content:center;
+           font-family:var(--mono);font-size:12px;color:transparent;line-height:1}
+  .c:hover .pick{border-color:var(--accent)}
+  .c.picked .pick{background:var(--accent);border-color:var(--accent);color:#0b0f04}
+  .c .num{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:7px;
+          letter-spacing:.05em}
+  .c .nm{font-size:12.5px;font-weight:500;line-height:1.25;margin-top:1px;
+         overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .c .mt{font-family:var(--mono);font-size:10px;color:var(--muted2);margin-top:2px;
+         letter-spacing:.08em;text-transform:uppercase}
+  .c .badge{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;color:var(--accent);
+            margin-top:2px}
+  .noimg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+         color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:.1em}
+
+  /* ---- CARD EDITOR ---- */
+  #ovl{border-left:1px solid var(--border);background:var(--surface);
+       display:flex;flex-direction:column;min-height:0}
+  #ovl .cap{padding:14px 16px 10px;border-bottom:1px solid var(--border)}
+  .pan{flex:1;display:flex;flex-direction:column;min-height:0}
+  .pan .bd{flex:1;overflow-y:auto;padding:14px 16px 22px}
+  .pan .ft{padding:11px 16px;border-top:1px solid var(--border);display:flex;gap:8px;
+           align-items:center;flex-wrap:wrap}
+  .pan .ft[hidden],.pan .ft button[hidden]{display:none}
+  .pan .ft button{flex:none}
+  .idhead{display:flex;gap:13px;margin-bottom:14px}
+  .idhead img{width:96px;border:1px solid var(--border);background:#07070b;
+              aspect-ratio:5/7;object-fit:contain}
+  .idhead .noimg{width:96px;aspect-ratio:5/7;border:1px solid var(--border)}
+  .idhead .num{font-family:var(--mono);font-size:11.5px;color:var(--muted);letter-spacing:.07em}
+  .idhead .nm{font-family:var(--display);font-size:21px;line-height:1.05;margin-top:3px;
+              letter-spacing:.02em}
+  .idhead .sub{font-size:12px;color:var(--muted2);margin-top:3px}
+  .sect .h{display:flex;align-items:center;gap:9px;margin:16px 0 8px}
+  .sect .h .line{flex:1;height:1px;background:var(--border)}
+  .msg{padding:8px 10px;border-radius:2px;font-family:var(--mono);font-size:11px;
+       margin-bottom:12px;letter-spacing:.04em}
+  .msg.good{border:1px solid var(--accent);color:var(--accent);background:var(--accent-dim)}
+  .msg.bad{border:1px solid #e8918c;color:#e8918c}
+  .blank{padding:40px 16px;text-align:center;color:var(--muted);
+         font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+         line-height:1.9}
+
+  /* ---- rapport d'action groupee ---- */
+  .modal{position:fixed;inset:0;background:rgba(5,5,9,.74);z-index:80;
+         display:flex;align-items:center;justify-content:center;padding:26px}
+  .modal[hidden]{display:none}
+  .modal .box{background:var(--bg);border:1px solid var(--border);border-radius:3px;
+              width:min(760px,100%);max-height:86vh;display:flex;flex-direction:column}
+  .modal .top{padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface);
+              display:flex;align-items:center;gap:12px}
+  .modal .top h3{margin:0;font-family:var(--display);font-size:20px;letter-spacing:.03em;
+                 text-transform:uppercase;flex:1;line-height:1.1}
+  .modal .bd{flex:1;overflow-y:auto;padding:14px 18px}
+  .modal .ft{padding:12px 18px;border-top:1px solid var(--border);background:var(--surface);
+             display:flex;justify-content:flex-end;gap:8px}
+  .bar{height:2px;background:var(--surface2);margin:10px 0 14px}
+  .bar i{display:block;height:100%;background:var(--accent);transition:width .12s}
+  .rep{width:100%;border-collapse:collapse}
+  .rep td{padding:6px 8px;border-bottom:1px solid var(--border);font-family:var(--mono);
+          font-size:11px;vertical-align:top;line-height:1.5}
+  .rep .st{white-space:nowrap;letter-spacing:.1em;text-transform:uppercase}
+  .rep .st.ok{color:var(--accent)} .rep .st.ko{color:#e8918c}
+  .rep .id{color:var(--text);word-break:break-all}
+  .rep .why{color:var(--muted);}
+  .sum{display:flex;gap:26px;margin-bottom:12px}
+  .sum .n{font-family:var(--display);font-size:30px;line-height:1}
+  .sum .n.ko{color:#e8918c} .sum .n.ok{color:var(--accent)}
+  @media(max-width:1280px){.wrap{grid-template-columns:224px 1fr 330px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">TANUKI</div>
+  <span class="meta" style="letter-spacing:.12em">/ OP-TCG API</span>
+  <span class="chip">Database</span>
+  <span class="grow"></span>
+  <div class="cmd">
+    <span class="sigil">⌕</span>
+    <input type="search" id="q" placeholder="Search cards...">
+    <span class="kbd" id="kbdHint">CTRL K</span>
+  </div>
+  <button id="btnSearch" class="ghost">Go</button>
+  <button id="btnClear" class="ghost">Reset</button>
+  <span class="grow"></span>
+  <div class="status"><span class="led"></span><span id="apiState">API online</span></div>
+  <span class="meta" id="tot"></span>
+  <nav class="nav">
+    <a href="/dashboard/editor.html" class="on">01 / Editor</a>
+    <a href="/dashboard/cleanup-review.html">02 / Cleanup</a>
+    <a href="/dashboard/index.html">03 / Dashboard</a>
+    <a href="/dashboard/sets.html">04 / Sets</a>
+  </nav>
+  <button id="logout" class="ghost">Sortir</button>
+</div>
+
+<div class="wrap">
+  <aside class="corners">
+    <div class="cap"><span class="eyebrow"><span class="dot"></span>
+      <span class="num">01</span><span class="sep">/</span> Sets</span></div>
+    <div class="list" id="sets"></div>
+    <div class="foot"><a href="/dashboard/sets.html"><button>+ Ajouter un set</button></a></div>
+  </aside>
+
+  <main id="main"><div class="empty">Select a set — or search</div></main>
+
+  <section id="ovl" class="corners">
+    <div class="cap"><span class="eyebrow"><span class="dot"></span> Card editor</span></div>
+    <div class="pan">
+      <div class="bd" id="panBody">
+        <div class="blank">no card selected<br>pick one in the grid</div>
+      </div>
+      <div class="ft" id="panFoot" hidden>
+        <button id="btnSave" class="primary">Save changes</button>
+        <button id="btnDup">Duplicate</button>
+        <span class="grow"></span>
+        <button id="btnDel" class="danger">Delete</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="box">
+    <div class="top"><h3 id="mTitle">Rapport</h3>
+      <button id="mClose" class="ghost">Fermer</button></div>
+    <div class="bd" id="mBody"></div>
+    <div class="ft"><button id="mOk" class="primary">OK</button></div>
+  </div>
+</div>
+
+<script>
+const $  = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c =>
+  ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let SETS = [], CARDS = [], CURRENT_SET = null, EDITING = null, MODE = "edit";
+let PICKED = new Set();                    // ids coches par l'utilisateur
+let FILTERS = {rarity:null, version:null, type:null, locked:null};
+let SORT = "collection";                   // collection | az | za
+let PAGE = 0;
+const NO_FILTER = () => ({rarity:null, version:null, type:null, locked:null});
+const SIZE_KEY = "poneglyph-page-size";
+let PAGE_SIZE = parseInt(localStorage.getItem(SIZE_KEY) || "30", 10);
+if(![30,50].includes(PAGE_SIZE)) PAGE_SIZE = 30;
+
+const SECTIONS = [
+  ["Identity", [
+    ["card_number","Card number","text"], ["name","Name","text"],
+    ["version","Version","text"], ["rarity","Rarity","text"],
+    ["type","Type","text"], ["colors","Color","list"], ["cost","Cost","number"],
+  ]],
+  ["Character data", [
+    ["power","Power","number"], ["counter","Counter","number"], ["life","Life","number"],
+    ["attribute","Attribute","text"], ["character_name","Character","text"],
+    ["affiliations","Subtype","list"], ["abilities","Abilities","list"],
+    ["effect","Effect","area"], ["trigger_effect","Trigger","area"],
+  ]],
+  ["Source", [
+    ["set_id","Set","set"], ["image_filename","Image file","text"],
+    ["block_number","Block","number"],
+  ]],
+];
+
+async function api(path, opts){
+  const r = await fetch(path, opts);
+  const j = await r.json().catch(() => ({error:"réponse illisible"}));
+  if(!r.ok) throw new Error(j.error || ("HTTP " + r.status));
+  return j;
+}
+function toast(msg, bad){
+  const t = document.createElement("div");
+  t.className = "toast" + (bad ? " bad" : "");
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 4200);
+}
+
+/* ---------- 01 / sets ---------- */
+async function loadSets(){
+  const d = await api("/api/sets");
+  SETS = d.sets;
+  $("#tot").textContent = `${d.total_cartes} cards · ${SETS.length} sets`;
+  $("#sets").innerHTML = SETS.map((s,i) => {
+    const manque = s.card_count != null && s.cards_en_base < s.card_count;
+    return `<div class="s" data-set="${esc(s.set_id)}">
+      <span class="idx">${String(i+1).padStart(2,"0")}</span>
+      <span class="body">
+        <div class="c">${esc(s.set_id)}</div>
+        <div class="nmset" title="${esc(s.name)}">${esc(s.name)}</div>
+        <div class="k"><b>${s.cards_en_base} / ${
+          s.card_count != null ? s.card_count : "—"}</b></div>
+      </span>
+      <span class="flag ${manque ? "warn" : ""}">${
+        manque ? "!" : (s.cards_verrouillees ? "🔒" : "")}</span>
+    </div>`;
+  }).join("");
+  $("#sets").querySelectorAll(".s").forEach(el =>
+    el.onclick = () => openSet(el.dataset.set));
+}
+
+async function openSet(sid){
+  CURRENT_SET = sid;
+  PICKED.clear(); PAGE = 0; FILTERS = NO_FILTER(); SORT = "collection";
+  $("#sets").querySelectorAll(".s").forEach(e =>
+    e.classList.toggle("on", e.dataset.set === sid));
+  $("#main").innerHTML = `<div class="empty">Loading ${esc(sid)}…</div>`;
+  const d = await api("/api/cards?set_id=" + encodeURIComponent(sid));
+  CARDS = d.cards;
+  const s = SETS.find(x => x.set_id === sid) || {};
+  const i = SETS.findIndex(x => x.set_id === sid) + 1;
+  const known = s.card_count != null;
+  const pct = known && s.card_count ? Math.round(d.total / s.card_count * 100) : null;
+  HEAD = {
+    title: `<div class="numtitle"><span class="n">${String(i).padStart(2,"0")}</span>
+       <span class="sl">/</span><span class="t">${esc(s.name || sid)}</span></div>`,
+    sub: `<b>${d.total}</b> / ${known ? s.card_count : "—"} cards` +
+      (pct !== null ? ` · <span class="${pct >= 100 ? "ok" : ""}">${pct}% complete</span>` : ""),
+  };
+  render();
+}
+
+let HEAD = {title:"", sub:""};
+
+/* ---------- filtres + pagination (aucune logique de suggestion) ---------- */
+function filtered(){
+  const list = CARDS.filter(c =>
+    (FILTERS.rarity === null || c.rarity === FILTERS.rarity) &&
+    (FILTERS.version === null || c.version === FILTERS.version) &&
+    (FILTERS.type === null || c.type === FILTERS.type) &&
+    (FILTERS.locked === null || !!c.locked === FILTERS.locked));
+  return sorted(list);
+}
+
+/* Tri applique APRES filtrage, AVANT pagination. Aucun classement implicite :
+   l'ordre affiche est toujours celui que l'utilisateur a choisi. */
+function sorted(list){
+  const num = (a, b) =>
+    a.card_number.localeCompare(b.card_number, "fr", {numeric:true}) ||
+    a.version.localeCompare(b.version, "fr");
+  const nom = (a, b) =>
+    a.name.localeCompare(b.name, "fr", {sensitivity:"base"}) || num(a, b);
+  const out = [...list];
+  if(SORT === "az") out.sort(nom);
+  else if(SORT === "za") out.sort((a, b) => nom(b, a));
+  else out.sort(num);            // collection : numero de carte croissant
+  return out;
+}
+
+function counts(key){
+  const m = new Map();
+  for(const c of CARDS) m.set(c[key], (m.get(c[key]) || 0) + 1);
+  return [...m.entries()].sort((a,b) => String(a[0]).localeCompare(String(b[0])));
+}
+
+function filterBar(){
+  const grp = (label, key, entries) => `
+    <div class="fgrp"><span class="label">${label}</span>
+      <button data-fk="${key}" data-fv="">All <span class="n">${CARDS.length}</span></button>
+      ${entries.map(([v,n]) => `<button data-fk="${key}" data-fv="${esc(v)}" ${
+        FILTERS[key] === v ? 'class="on"' : ""}>${esc(v)} <span class="n">${n}</span></button>`).join("")}
+    </div>`;
+  const lockedN = CARDS.filter(c => c.locked).length;
+  const tri = [["collection","Collection"], ["az","A → Z"], ["za","Z → A"]];
+  return `<div class="fbar">
+    ${grp("Type", "type", counts("type"))}
+    ${grp("Rarity", "rarity", counts("rarity"))}
+    ${grp("Version", "version", counts("version"))}
+    <div class="fgrp"><span class="label">State</span>
+      <button data-fk="locked" data-fv="">All <span class="n">${CARDS.length}</span></button>
+      <button data-fk="locked" data-fv="1" ${FILTERS.locked === true ? 'class="on"' : ""}>Locked
+        <span class="n">${lockedN}</span></button>
+      <button data-fk="locked" data-fv="0" ${FILTERS.locked === false ? 'class="on"' : ""}>Unlocked
+        <span class="n">${CARDS.length - lockedN}</span></button>
+    </div>
+    <div class="fgrp"><span class="label">Sort</span>
+      ${tri.map(([k,l]) => `<button data-sk="${k}" ${
+        SORT === k ? 'class="on"' : ""}>${l}</button>`).join("")}
+    </div>
+  </div>`;
+}
+
+function pager(nFiltered){
+  const pages = Math.max(1, Math.ceil(nFiltered / PAGE_SIZE));
+  if(PAGE >= pages) PAGE = pages - 1;
+  const from = nFiltered ? PAGE * PAGE_SIZE + 1 : 0;
+  const to = Math.min((PAGE + 1) * PAGE_SIZE, nFiltered);
+  return `<div class="pager">
+    <button id="pgPrev" ${PAGE === 0 ? "disabled" : ""}>← Préc.</button>
+    <span class="pg">page <b>${PAGE + 1}</b> / ${pages} · <b>${from}–${to}</b> sur ${nFiltered}</span>
+    <button id="pgNext" ${PAGE >= pages - 1 ? "disabled" : ""}>Suiv. →</button>
+    <span class="grow" style="flex:1"></span>
+    <span class="label">par page</span>
+    <select id="pgSize">
+      <option value="30" ${PAGE_SIZE === 30 ? "selected" : ""}>30</option>
+      <option value="50" ${PAGE_SIZE === 50 ? "selected" : ""}>50</option>
+    </select>
+  </div>`;
+}
+
+function selbar(){
+  if(!PICKED.size) return "";
+  // Pas de set pre-selectionne : deplacer est destructif, la cible doit etre
+  // un choix explicite et non le premier set de la liste.
+  const opts = SETS.filter(s => s.set_id !== CURRENT_SET)
+    .map(s => `<option value="${esc(s.set_id)}">${esc(s.set_id)} — ${esc(s.name)}</option>`)
+    .join("");
+  return `<div class="selbar">
+    <span class="n">${PICKED.size}</span>
+    <span class="label">carte(s) sélectionnée(s)</span>
+    <span class="grow" style="flex:1"></span>
+    <span class="label">déplacer vers</span>
+    <select id="bulkTarget">
+      <option value="" selected>— choisir un set —</option>${opts}</select>
+    <button id="bulkMove" class="primary" disabled>Déplacer</button>
+    <button id="bulkDel" class="danger">Supprimer</button>
+    <button id="bulkNone" class="ghost">Désélectionner</button>
+  </div>`;
+}
+
+function render(){
+  const list = filtered();
+  const pages = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+  if(PAGE >= pages) PAGE = pages - 1;
+  if(PAGE < 0) PAGE = 0;
+  const slice = list.slice(PAGE * PAGE_SIZE, (PAGE + 1) * PAGE_SIZE);
+
+  $("#main").innerHTML = `
+    <div class="ghead">
+      <div>${HEAD.title}<div class="sub">${HEAD.sub}</div></div>
+      <span class="grow" style="flex:1"></span>
+      <button id="btnPickPage" class="ghost">Cocher la page</button>
+      <button id="btnNew" class="primary">+ Ajouter une carte</button>
+    </div>
+    ${CURRENT_SET ? filterBar() : ""}
+    ${selbar()}
+    <div class="grid">${slice.map(c => cardTile(c)).join("")}</div>
+    ${pager(list.length)}`;
+
+  $("#main").querySelectorAll(".c").forEach(el => {
+    const card = CARDS.find(c => c.id === el.dataset.id);
+    el.onclick = () => openEditor(card);
+    el.querySelector(".pick").onclick = ev => {
+      ev.stopPropagation();
+      PICKED.has(card.id) ? PICKED.delete(card.id) : PICKED.add(card.id);
+      render();
+    };
+  });
+  $("#btnNew").onclick = openNew;
+  $("#btnPickPage").onclick = () => { slice.forEach(c => PICKED.add(c.id)); render(); };
+  const prev = $("#pgPrev"), next = $("#pgNext"), size = $("#pgSize");
+  if(prev) prev.onclick = () => { PAGE--; render(); };
+  if(next) next.onclick = () => { PAGE++; render(); };
+  if(size) size.onchange = e => {
+    PAGE_SIZE = parseInt(e.target.value, 10);
+    localStorage.setItem(SIZE_KEY, String(PAGE_SIZE));
+    PAGE = 0; render();
+  };
+  $("#main").querySelectorAll("[data-fk]").forEach(b => b.onclick = () => {
+    const k = b.dataset.fk, v = b.dataset.fv;
+    FILTERS[k] = v === "" ? null : (k === "locked" ? v === "1" : v);
+    PAGE = 0; render();
+  });
+  $("#main").querySelectorAll("[data-sk]").forEach(b => b.onclick = () => {
+    SORT = b.dataset.sk; PAGE = 0; render();
+  });
+  if(PICKED.size){
+    $("#bulkNone").onclick = () => { PICKED.clear(); render(); };
+    $("#bulkMove").onclick = bulkMove;
+    $("#bulkDel").onclick  = bulkDelete;
+    // « Déplacer » ne s'active qu'une fois une cible explicitement choisie.
+    $("#bulkTarget").onchange = e => $("#bulkMove").disabled = !e.target.value;
+  }
+}
+
+function cardTile(c){
+  const img = c.image_filename
+    ? `<img loading="lazy" src="/images/${esc(c.image_filename)}" alt="">`
+    : `<div class="noimg">no image</div>`;
+  return `<div class="c ${PICKED.has(c.id) ? "picked" : ""}" data-id="${esc(c.id)}">
+    <div class="shot">${img}<div class="pick">✓</div><div class="open">OPEN →</div></div>
+    <div class="num">${esc(c.card_number)}</div>
+    <div class="nm">${esc(c.name)}</div>
+    <div class="mt">${esc(c.rarity)} · ${esc(c.version)}</div>
+    ${CURRENT_SET === null ? `<div class="mt">${esc(c.set_id)}</div>` : ""}
+    ${c.locked ? `<div class="badge">● LOCKED</div>` : ""}
+  </div>`;
+}
+
+async function doSearch(){
+  const q = $("#q").value.trim();
+  if(q.length < 2) return toast("Recherche : 2 caractères minimum.", true);
+  CURRENT_SET = null; PICKED.clear(); PAGE = 0;
+  FILTERS = NO_FILTER(); SORT = "collection";
+  $("#sets").querySelectorAll(".s").forEach(e => e.classList.remove("on"));
+  $("#main").innerHTML = `<div class="empty">Searching…</div>`;
+  try{
+    const d = await api("/api/search?q=" + encodeURIComponent(q));
+    CARDS = d.cards;
+    HEAD = {
+      title: `<div class="numtitle"><span class="n">⌕</span><span class="sl">/</span>
+        <span class="t">${esc(q)}</span></div>`,
+      sub: `<b>${d.total}</b> result(s)${d.tronque ? " · first 300 shown" : ""}`,
+    };
+    render();
+  }catch(e){ $("#main").innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+}
+
+/* ---------- actions groupees : boucle sur les endpoints unitaires ---------- */
+function pickedCards(){ return CARDS.filter(c => PICKED.has(c.id)); }
+
+function listeIds(cards, max = 8){
+  const noms = cards.slice(0, max).map(c => `  ${c.id}`).join("\n");
+  return noms + (cards.length > max ? `\n  + ${cards.length - max} autre(s)` : "");
+}
+
+function openModal(titre, html){
+  $("#mTitle").textContent = titre;
+  $("#mBody").innerHTML = html;
+  $("#modal").hidden = false;
+}
+
+function reportHTML(results){
+  const ok = results.filter(r => r.ok), ko = results.filter(r => !r.ok);
+  return `<div class="sum">
+      <div><div class="n ok">${ok.length}</div><div class="label">réussies</div></div>
+      <div><div class="n ${ko.length ? "ko" : ""}">${ko.length}</div>
+        <div class="label">échouées</div></div>
+      <div><div class="n">${results.length}</div><div class="label">traitées</div></div>
+    </div>
+    <table class="rep">${results.map(r => `<tr>
+      <td class="st ${r.ok ? "ok" : "ko"}">${r.ok ? "OK" : "ÉCHEC"}</td>
+      <td class="id">${esc(r.id)}${r.newId && r.newId !== r.id
+        ? `<br><span class="why">→ ${esc(r.newId)}</span>` : ""}</td>
+      <td class="why">${esc(r.msg)}</td></tr>`).join("")}</table>`;
+}
+
+async function runBulk(titre, cards, fn){
+  openModal(titre, `<div class="label">traitement en cours…</div>
+    <div class="bar"><i id="bi" style="width:0%"></i></div>
+    <div class="meta" id="bt">0 / ${cards.length}</div>`);
+  const results = [];
+  for(let i = 0; i < cards.length; i++){
+    const c = cards[i];
+    try{
+      const r = await fn(c);
+      results.push({ok:true, id:c.id, newId:r && r.id, msg:(r && r.message) || "fait"});
+    }catch(e){
+      results.push({ok:false, id:c.id, msg:e.message});
+    }
+    const pct = Math.round((i + 1) / cards.length * 100);
+    const bi = $("#bi"), bt = $("#bt");
+    if(bi) bi.style.width = pct + "%";
+    if(bt) bt.textContent = `${i + 1} / ${cards.length}`;
+  }
+  PICKED.clear();
+  await refresh();
+  openModal(titre + " — rapport", reportHTML(results));
+  return results;
+}
+
+async function bulkMove(){
+  const cards = pickedCards();
+  const target = $("#bulkTarget").value;
+  if(!cards.length || !target) return;
+  if(!confirm(`Déplacer ${cards.length} carte(s) vers ${target} ?\n\n`
+            + `${listeIds(cards)}\n\n`
+            + `L'identifiant de chaque carte est recalculé. Une carte dont l'identifiant `
+            + `entrerait en conflit dans ${target} sera signalée comme échec, sans être déplacée.\n`
+            + `Chaque carte déplacée est verrouillée.`)) return;
+  await runBulk(`Déplacement vers ${target}`, cards, c =>
+    api("/api/card?id=" + encodeURIComponent(c.id), {method:"PUT",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({set_id: target})}));
+}
+
+async function bulkDelete(){
+  const cards = pickedCards();
+  if(!cards.length) return;
+  const verrou = cards.filter(c => c.locked).length;
+  if(!confirm(`Supprimer définitivement ${cards.length} carte(s) ?\n\n`
+            + `${listeIds(cards)}\n\n`
+            + (verrou ? `${verrou} d'entre elles sont verrouillées (corrigées à la main).\n` : "")
+            + `Les fichiers image ne sont pas touchés.\nAction irréversible.`)) return;
+  if(!confirm(`Dernière confirmation : supprimer ${cards.length} carte(s) ?`)) return;
+  await runBulk("Suppression groupée", cards, c =>
+    api("/api/card?id=" + encodeURIComponent(c.id), {method:"DELETE"}));
+}
+
+/* ---------- card editor ---------- */
+function inputFor(key, label, kind, c){
+  const v = c[key];
+  if(kind === "set"){
+    const opts = SETS.map(s => `<option value="${esc(s.set_id)}" ${
+      s.set_id === c.set_id ? "selected" : ""}>${esc(s.set_id)}</option>`).join("");
+    return `<div class="rowfield"><label>${label}</label>
+      <select name="${key}">${opts}</select></div>`;
+  }
+  if(kind === "area")
+    return `<div class="rowfield tall"><label>${label}</label>
+      <textarea name="${key}">${esc(v)}</textarea></div>`;
+  if(kind === "list")
+    return `<div class="rowfield"><label>${label}</label>
+      <input type="text" name="${key}" value="${esc((v||[]).join(", "))}"></div>`;
+  return `<div class="rowfield"><label>${label}</label>
+    <input type="${kind}" name="${key}" value="${esc(v)}"></div>`;
+}
+
+function openEditor(card){
+  MODE = "edit"; EDITING = card;
+  $("#main").querySelectorAll(".c").forEach(el =>
+    el.classList.toggle("sel", el.dataset.id === card.id));
+  renderForm(card);
+}
+
+function openNew(){
+  MODE = "create";
+  EDITING = {set_id: CURRENT_SET || (SETS[0] && SETS[0].set_id) || "", version: "Standard",
+             colors: [], affiliations: [], abilities: []};
+  $("#main").querySelectorAll(".c").forEach(el => el.classList.remove("sel"));
+  renderForm(EDITING);
+}
+
+function closePanel(){
+  EDITING = null;
+  $("#panFoot").hidden = true;
+  $("#main").querySelectorAll(".c").forEach(el => el.classList.remove("sel"));
+  $("#panBody").innerHTML = `<div class="blank">no card selected<br>pick one in the grid</div>`;
+}
+
+function renderForm(c){
+  $("#panFoot").hidden = false;
+  $("#btnDup").hidden = MODE === "create";
+  $("#btnDel").hidden = MODE === "create";
+  const img = c.image_filename
+    ? `<img id="prev" src="/images/${esc(c.image_filename)}" alt="">`
+    : `<div class="noimg">no image</div>`;
+
+  $("#panBody").innerHTML = `
+    <div id="msg"></div>
+    <div class="idhead">${img}
+      <div style="min-width:0">
+        <div class="num">${MODE === "create" ? "NEW CARD" : esc(c.card_number)}</div>
+        <div class="nm">${MODE === "create" ? "—" : esc(c.name)}</div>
+        <div class="sub">${esc(c.rarity)}${c.version ? " · " + esc(c.version) : ""}</div>
+        ${MODE === "edit" ? `<div class="idbox hint" style="margin-top:6px;word-break:break-all">${
+            esc(c.id)}</div>
+          <div class="status ${c.locked ? "" : "off"}" style="margin-top:7px">
+            <span class="led"></span>${c.locked ? "Locked" : "Unlocked"}</div>
+          <div class="hint" style="margin-top:4px">${c.locked
+            ? "les scrapers ne la réécrivent pas"
+            : "un scraping peut encore l'écraser"}</div>` : ""}
+      </div></div>
+    ${SECTIONS.map(([titre, champs]) => `
+      <div class="sect">
+        <div class="h"><span class="label">${titre}</span><span class="line"></span></div>
+        ${champs.map(([k,l,kind]) => inputFor(k,l,kind,c)).join("")}
+      </div>`).join("")}
+    <div class="hint" style="margin-top:14px">
+      Numéro, version et set forment l'identifiant : les modifier réécrit la ligne.
+      Refusé si l'identifiant obtenu existe déjà.</div>`;
+
+  const fn = $("#panBody").querySelector("[name=image_filename]");
+  if(fn) fn.oninput = () => { const p = $("#prev"); if(p) p.src = "/images/" + fn.value; };
+}
+
+function collect(){
+  const out = {};
+  $("#panBody").querySelectorAll("[name]").forEach(el => out[el.name] = el.value);
+  return out;
+}
+function showMsg(text, bad){
+  $("#msg").innerHTML = `<div class="msg ${bad ? "bad" : "good"}">${esc(text)}</div>`;
+}
+
+async function save(){
+  const payload = collect();
+  $("#btnSave").disabled = true;
+  try{
+    const r = MODE === "create"
+      ? await api("/api/card", {method:"POST",
+          headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)})
+      : await api("/api/card?id=" + encodeURIComponent(EDITING.id), {method:"PUT",
+          headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)});
+    toast(r.message || "Enregistré.");
+    closePanel();
+    await refresh();
+  }catch(e){ showMsg(e.message, true); toast(e.message, true); }
+  finally{ $("#btnSave").disabled = false; }
+}
+
+async function duplicate(){
+  if(!confirm("Créer une copie de cette carte ? Elle sera enregistrée sous une version "
+            + "« copie » que vous pourrez renommer.")) return;
+  try{
+    const r = await api("/api/duplicate?id=" + encodeURIComponent(EDITING.id), {method:"POST"});
+    toast(r.message); closePanel(); await refresh();
+  }catch(e){ showMsg(e.message, true); }
+}
+
+async function remove(){
+  if(!confirm(`Supprimer définitivement ${EDITING.card_number} — ${EDITING.name} ?\n\n`
+            + `Identifiant : ${EDITING.id}\nCette action est irréversible.`)) return;
+  try{
+    const r = await api("/api/card?id=" + encodeURIComponent(EDITING.id), {method:"DELETE"});
+    toast(r.message); closePanel(); await refresh();
+  }catch(e){ showMsg(e.message, true); }
+}
+
+async function refresh(){
+  const p = PAGE, f = {...FILTERS};
+  await loadSets();
+  if(CURRENT_SET){ await openSet(CURRENT_SET); FILTERS = f; PAGE = p; render(); }
+  else if($("#q").value.trim().length >= 2) await doSearch();
+}
+
+$("#btnSearch").onclick = doSearch;
+$("#q").onkeydown = e => { if(e.key === "Enter") doSearch(); };
+$("#btnClear").onclick = () => {
+  $("#q").value = ""; CURRENT_SET = null; PICKED.clear();
+  $("#sets").querySelectorAll(".s").forEach(e => e.classList.remove("on"));
+  $("#main").innerHTML = `<div class="empty">Select a set — or search</div>`;
+  closePanel();
+};
+$("#btnSave").onclick = save;
+$("#btnDup").onclick  = duplicate;
+$("#btnDel").onclick  = remove;
+$("#mClose").onclick = () => $("#modal").hidden = true;
+$("#mOk").onclick    = () => $("#modal").hidden = true;
+
+if(navigator.platform && /mac/i.test(navigator.platform)) $("#kbdHint").textContent = "⌘ K";
+document.onkeydown = e => {
+  if(e.key === "Escape"){ if(!$("#modal").hidden) $("#modal").hidden = true; else closePanel(); }
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){
+    e.preventDefault(); $("#q").focus(); $("#q").select();
+  }
+};
+
+loadSets().catch(e => {
+  $("#apiState").textContent = "API offline";
+  document.querySelector(".status").classList.add("off");
+  $("#sets").innerHTML = `<div class="empty">${esc(e.message)}<br><br>
+    run python dashboard/server.py</div>`;
+});
+</script>
+</body>
+</html>

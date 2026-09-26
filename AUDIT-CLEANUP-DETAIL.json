@@ -1,0 +1,1482 @@
+{
+ "genere_le": "2026-09-26T18:08:51+02:00",
+ "source": "recalcul depuis le dashboard — cleanup.py (audit) --cutoff 2026-08-20T00:00:00+00:00",
+ "avertissement": "Aucune de ces actions n'a ete appliquee. Recalcul complet contre l'etat actuel de la base : les entrees deja resolues a la main ont disparu d'elles-memes.",
+ "critere_identite_du_script": {
+  "regle_1a_doublon_meme_set": "card_number + set_id + version canonique.",
+  "regle_1b_doublon_SP": "card_number + set_id, apparie par rarete SP, match 1 contre 1.",
+  "regle_2_doublon_inter_sets": "card_number + version canonique. Le set_id N'EST PAS compare, la rarete non plus. Regle a surveiller.",
+  "regle_3_reassignation": "card_number seul. Ne supprime rien.",
+  "cartes_verrouillees": "Toute action visant une ligne locked=true est retiree du plan : les corrections manuelles ne sont jamais defaites."
+ },
+ "etat_base_actuel": {
+  "cartes": 3192,
+  "sets": 92,
+  "verrouillees": 602
+ },
+ "projection_si_applique": {
+  "cartes": 3174,
+  "sets": 92,
+  "sets_retires": []
+ },
+ "totaux": {
+  "suppressions": 18,
+  "reassignations": 10,
+  "ambigus_non_traites": 10,
+  "protegees_car_verrouillees": 9,
+  "entrees_avec_alerte": 28
+ },
+ "suppressions_a_risque": [],
+ "protegees_car_verrouillees": [
+  {
+   "id": "OP05-066_standard_ST18",
+   "kept": "OP05-066_standard_ST26",
+   "reason": "doublon inter-sets",
+   "card_number": "OP05-066",
+   "set_id": "ST18",
+   "version_opecards": "Standard",
+   "version_bandai": "Standard",
+   "set_bandai": "ST26",
+   "action": "delete"
+  },
+  {
+   "id": "OP05-070_standard_ST18",
+   "kept": "OP05-070_standard_ST26",
+   "reason": "doublon inter-sets",
+   "card_number": "OP05-070",
+   "set_id": "ST18",
+   "version_opecards": "Standard",
+   "version_bandai": "Standard",
+   "set_bandai": "ST26",
+   "action": "delete"
+  },
+  {
+   "id": "OP01-029_standard_P",
+   "kept": "OP01-029_standard_PRB01",
+   "reason": "doublon inter-sets",
+   "card_number": "OP01-029",
+   "set_id": "P",
+   "version_opecards": "Standard",
+   "version_bandai": "Standard",
+   "set_bandai": "PRB01",
+   "action": "delete"
+  },
+  {
+   "id": "OP14-084_special_card_OP16",
+   "card_number": "OP14-084",
+   "version": "Special Card",
+   "from_set": "OP16",
+   "to_set": "OP14-EB04",
+   "new_id": "OP14-084_special_card_OP14-EB04",
+   "reason": "convention Bandai : card_number connu uniquement dans ce set",
+   "action": "reassign"
+  },
+  {
+   "id": "OP11-067_special_card_OP16",
+   "card_number": "OP11-067",
+   "version": "Special Card",
+   "from_set": "OP16",
+   "to_set": "OP11",
+   "new_id": "OP11-067_special_card_OP11",
+   "reason": "convention Bandai : card_number connu uniquement dans ce set",
+   "action": "reassign"
+  },
+  {
+   "id": "OP10-045_special_card_OP16",
+   "card_number": "OP10-045",
+   "version": "Special Card",
+   "from_set": "OP16",
+   "to_set": "OP10",
+   "new_id": "OP10-045_special_card_OP10",
+   "reason": "convention Bandai : card_number connu uniquement dans ce set",
+   "action": "reassign"
+  },
+  {
+   "id": "EB04-054_special_card_OP16",
+   "card_number": "EB04-054",
+   "version": "Special Card",
+   "from_set": "OP16",
+   "to_set": "OP15-EB04",
+   "new_id": "EB04-054_special_card_OP15-EB04",
+   "reason": "convention Bandai : card_number connu uniquement dans ce set",
+   "action": "reassign"
+  },
+  {
+   "id": "P-081_evenement_de_sortie_gagnant_PESW-OP11",
+   "card_number": "P-081",
+   "version": "Événement de sortie - Gagnant",
+   "from_set": "PESW-OP11",
+   "to_set": "PRB02",
+   "new_id": "P-081_evenement_de_sortie_gagnant_PRB02",
+   "reason": "convention Bandai : card_number connu uniquement dans ce set",
+   "action": "reassign"
+  },
+  {
+   "id": "P-081_evenement_de_sortie_PESW-OP11",
+   "card_number": "P-081",
+   "version": "Événement de sortie",
+   "from_set": "PESW-OP11",
+   "to_set": "PRB02",
+   "new_id": "P-081_evenement_de_sortie_PRB02",
+   "reason": "convention Bandai : card_number connu uniquement dans ce set",
+   "action": "reassign"
+  }
+ ],
+ "repartition_par_set_source": {
+  "OP09": {
+   "suppressions": 0,
+   "reassignations": 1
+  },
+  "OP17": {
+   "suppressions": 0,
+   "reassignations": 9
+  },
+  "PRB01": {
+   "suppressions": 3,
+   "reassignations": 0
+  },
+  "PRB02": {
+   "suppressions": 2,
+   "reassignations": 0
+  },
+  "ST15": {
+   "suppressions": 2,
+   "reassignations": 0
+  },
+  "ST19": {
+   "suppressions": 4,
+   "reassignations": 0
+  },
+  "ST23": {
+   "suppressions": 1,
+   "reassignations": 0
+  },
+  "ST25": {
+   "suppressions": 1,
+   "reassignations": 0
+  },
+  "ST26": {
+   "suppressions": 1,
+   "reassignations": 0
+  },
+  "ST31": {
+   "suppressions": 1,
+   "reassignations": 0
+  },
+  "ST32": {
+   "suppressions": 1,
+   "reassignations": 0
+  },
+  "ST33": {
+   "suppressions": 1,
+   "reassignations": 0
+  },
+  "ST35": {
+   "suppressions": 1,
+   "reassignations": 0
+  }
+ },
+ "cas_ambigus": [
+  {
+   "id": "P-084_alternative_art_sp_OP17",
+   "card_number": "P-084",
+   "version": "Alternative Art SP",
+   "set_id": "OP17",
+   "bandai_sets": [
+    "PESW-OP10",
+    "ST25"
+   ],
+   "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+  },
+  {
+   "id": "OP14-108_alternative_art_sp_OP17",
+   "card_number": "OP14-108",
+   "version": "Alternative Art SP",
+   "set_id": "OP17",
+   "bandai_sets": [
+    "DP-OP14-EB04",
+    "OP14-EB04"
+   ],
+   "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+  },
+  {
+   "id": "ST15-005_special_card_OP16",
+   "card_number": "ST15-005",
+   "version": "Special Card",
+   "set_id": "OP16",
+   "bandai_sets": [
+    "OPP0",
+    "ST15"
+   ],
+   "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+  },
+  {
+   "id": "OP14-029_special_card_OP16",
+   "card_number": "OP14-029",
+   "version": "Special Card",
+   "set_id": "OP16",
+   "bandai_sets": [
+    "DP-OP14-EB04",
+    "OP14-EB04"
+   ],
+   "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+  },
+  {
+   "id": "ST16-004_special_card_OP11",
+   "card_number": "ST16-004",
+   "version": "Special Card",
+   "set_id": "OP11",
+   "bandai_sets": [
+    "OPP0",
+    "PRB02",
+    "ST16"
+   ],
+   "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+  },
+  {
+   "id": "ST18-005_special_card_OP11",
+   "card_number": "ST18-005",
+   "version": "Special Card",
+   "set_id": "OP11",
+   "bandai_sets": [
+    "OPP0",
+    "ST18"
+   ],
+   "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+  },
+  {
+   "id": "OP06-119_special_card_OP11",
+   "card_number": "OP06-119",
+   "version": "Special Card",
+   "set_id": "OP11",
+   "bandai_sets": [
+    "OP09",
+    "PRB02"
+   ],
+   "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+  },
+  {
+   "id": "OP07-021_special_card_OP10",
+   "card_number": "OP07-021",
+   "version": "Special Card",
+   "set_id": "OP10",
+   "bandai_sets": [
+    "PRB02",
+    "ST24"
+   ],
+   "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+  },
+  {
+   "id": "ST15-002_special_card_OP10",
+   "card_number": "ST15-002",
+   "version": "Special Card",
+   "set_id": "OP10",
+   "bandai_sets": [
+    "PRB02",
+    "ST15"
+   ],
+   "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+  },
+  {
+   "id": "ST18-001_special_card_OP10",
+   "card_number": "ST18-001",
+   "version": "Special Card",
+   "set_id": "OP10",
+   "bandai_sets": [
+    "PRB02",
+    "ST18"
+   ],
+   "reason": "card_number présent dans plusieurs sets Bandai — arbitrage manuel"
+  }
+ ],
+ "set_renames": [
+  {
+   "set_id": "DPS11",
+   "before": "Double Pack Set Vol.11 [DP-11]",
+   "after": "Double Pack Set 11"
+  },
+  {
+   "set_id": "DPS10",
+   "before": "Double Pack Set Vol.10 [DP-10]",
+   "after": "Double Pack Set 10"
+  },
+  {
+   "set_id": "DPS08",
+   "before": "Double Pack Set Vol.8",
+   "after": "Double Pack Set 8"
+  },
+  {
+   "set_id": "DPS09",
+   "before": "Double Pack Set Vol.9",
+   "after": "Double Pack Set 9"
+  },
+  {
+   "set_id": "DPS12",
+   "before": "Double Pack Set Vol.12",
+   "after": "Double Pack Set 12"
+  }
+ ],
+ "images_orphelines_qui_seraient_effacees": [],
+ "actions": [
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero OP04-016 en version 'Standard' (canonique 'standard') existe deja sous le code Bandai OP04-016_standard_PRB02 dans le set PRB02. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (ST31 -> PRB02) - si ce sont deux impressions distinctes, la suppression est A TORT"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "OP04-016_standard_ST31",
+    "nom": "Menu \"Bonnes manières\", Kick Course",
+    "numero": "OP04-016",
+    "set_id": "ST31",
+    "set_nom": "DECK POUR DÉBUTANT - ROUGE Monkey D. Luffy",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENT",
+    "image_fichier": "OP04-016_standard.webp",
+    "image_locale": "images/OP04-016_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP04-016_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-20T10:27:45.566656+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "OP04-016_standard_PRB02",
+    "nom": "Menu \"Bonnes manières\", Kick Course",
+    "numero": "OP04-016",
+    "set_id": "PRB02",
+    "set_nom": "PREMIUM BOOSTER - ONE PIECE CARD THE BEST VOL.2",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENTS",
+    "image_fichier": "OP04-016_standard.webp",
+    "image_locale": "images/OP04-016_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP04-016_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T20:39:18.719601+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero OP13-019 en version 'Standard' (canonique 'standard') existe deja sous le code Bandai OP13-019_standard_OP13 dans le set OP13. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (ST35 -> OP13) - si ce sont deux impressions distinctes, la suppression est A TORT",
+    "NOMS DIFFERENTS ('Les flammes d'Ace, elles, ne vous ont pas pardonnés !' vs 'Les flammes d'Ace, elles, ne vous ont pas pardonnés !')"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "OP13-019_standard_ST35",
+    "nom": "Les flammes d'Ace, elles, ne vous ont pas pardonnés !",
+    "numero": "OP13-019",
+    "set_id": "ST35",
+    "set_nom": "DECK POUR DÉBUTANT - ROUGE/NOIR Sabo",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENT",
+    "image_fichier": "OP13-019_standard.webp",
+    "image_locale": "images/OP13-019_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP13-019_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-21T02:06:43.896978+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "OP13-019_standard_OP13",
+    "nom": "Les flammes d'Ace, elles, ne vous ont pas pardonnés !",
+    "numero": "OP13-019",
+    "set_id": "OP13",
+    "set_nom": "SUCCESSEURS",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENTS",
+    "image_fichier": "OP13-019_standard.webp",
+    "image_locale": "images/OP13-019_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP13-019_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T21:36:08.439296+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero EB04-028 en version 'Standard' (canonique 'standard') existe deja sous le code Bandai EB04-028_standard_OP14-EB04 dans le set OP14-EB04. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (ST33 -> OP14-EB04) - si ce sont deux impressions distinctes, la suppression est A TORT"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "EB04-028_standard_ST33",
+    "nom": "Ice Time",
+    "numero": "EB04-028",
+    "set_id": "ST33",
+    "set_nom": "DECK POUR DÉBUTANT - BLEU Kuzan",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENT",
+    "image_fichier": "EB04-028_standard.webp",
+    "image_locale": "images/EB04-028_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/EB04-028_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-21T02:07:06.573675+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "EB04-028_standard_OP14-EB04",
+    "nom": "Ice Time",
+    "numero": "EB04-028",
+    "set_id": "OP14-EB04",
+    "set_nom": "LES SEPT DE LA MER D'AZUR",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENTS",
+    "image_fichier": "EB04-028_standard.webp",
+    "image_locale": "images/EB04-028_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/EB04-028_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T22:37:04.504362+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero OP12-039 en version 'Standard' (canonique 'standard') existe deja sous le code Bandai OP12-039_standard_OP12 dans le set OP12. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (ST32 -> OP12) - si ce sont deux impressions distinctes, la suppression est A TORT",
+    "NOMS DIFFERENTS ('Luffy deviendra un jour le roi des pirates !!' vs 'Luffy deviendra un jour le roi des pirates !!')"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "OP12-039_standard_ST32",
+    "nom": "Luffy deviendra un jour le roi des pirates !!",
+    "numero": "OP12-039",
+    "set_id": "ST32",
+    "set_nom": "DECK POUR DÉBUTANT - VERT Roronoa Zoro",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENT",
+    "image_fichier": "OP12-039_standard.webp",
+    "image_locale": "images/OP12-039_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP12-039_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-21T02:08:44.914347+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "OP12-039_standard_OP12",
+    "nom": "Luffy deviendra un jour le roi des pirates !!",
+    "numero": "OP12-039",
+    "set_id": "OP12",
+    "set_nom": "L'HÉRITAGE DU MAÎTRE",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENTS",
+    "image_fichier": "OP12-039_standard.webp",
+    "image_locale": "images/OP12-039_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP12-039_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T21:42:06.280816+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero ST20-003 en version 'Standard' (canonique 'standard') existe deja sous le code Bandai ST20-003_standard_ST20 dans le set ST20. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (PRB02 -> ST20) - si ce sont deux impressions distinctes, la suppression est A TORT"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "ST20-003_standard_PRB02",
+    "nom": "Charlotte Brûlée",
+    "numero": "ST20-003",
+    "set_id": "PRB02",
+    "set_nom": "PREMIUM BOOSTER - ONE PIECE CARD THE BEST VOL.2",
+    "rarete": "C",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "PERSONNAGE",
+    "image_fichier": "ST20-003_standard.webp",
+    "image_locale": "images/ST20-003_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/ST20-003_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-20T10:27:45.89576+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "ST20-003_standard_ST20",
+    "nom": "Charlotte Brûlée",
+    "numero": "ST20-003",
+    "set_id": "ST20",
+    "set_nom": "DECK POUR DÉBUTANT - JAUNE Charlotte Katakuri",
+    "rarete": "C",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "PERSONNAGE",
+    "image_fichier": "ST20-003_standard.webp",
+    "image_locale": "images/ST20-003_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/ST20-003_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T21:59:17.908682+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero ST21-003 en version 'Alternative Art' (canonique 'alternative art') existe deja sous le code Bandai ST21-003_alternative_art_ST21 dans le set ST21. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (PRB02 -> ST21) - si ce sont deux impressions distinctes, la suppression est A TORT"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "ST21-003_alternative_art_PRB02",
+    "nom": "Sanji",
+    "numero": "ST21-003",
+    "set_id": "PRB02",
+    "set_nom": "PREMIUM BOOSTER - ONE PIECE CARD THE BEST VOL.2",
+    "rarete": "C",
+    "version": "Alternative Art",
+    "version_canonique": "alternative art",
+    "type": "PERSONNAGE",
+    "image_fichier": "ST21-003_alternative_art.webp",
+    "image_locale": "images/ST21-003_alternative_art.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/ST21-003_alternative_art.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-20T10:27:45.89576+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "ST21-003_alternative_art_ST21",
+    "nom": "Sanji",
+    "numero": "ST21-003",
+    "set_id": "ST21",
+    "set_nom": "DECK DE DÉMARRAGE EX - GEAR 5TH",
+    "rarete": "C",
+    "version": "Alternative Art",
+    "version_canonique": "alternative art",
+    "type": "PERSONNAGE",
+    "image_fichier": "ST21-003_alternative_art.webp",
+    "image_locale": "images/ST21-003_alternative_art.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/ST21-003_alternative_art.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T21:58:55.347594+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero OP09-078 en version 'Standard' (canonique 'standard') existe deja sous le code Bandai OP09-078_standard_PRB02 dans le set PRB02. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (ST26 -> PRB02) - si ce sont deux impressions distinctes, la suppression est A TORT"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "OP09-078_standard_ST26",
+    "nom": "Gum Gum Gigant",
+    "numero": "OP09-078",
+    "set_id": "ST26",
+    "set_nom": "DECK POUR DÉMARRAGE - VIOLET/NOIR Monkey D. Luffy",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENT",
+    "image_fichier": "OP09-078_standard.webp",
+    "image_locale": "images/OP09-078_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP09-078_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-20T10:27:45.89576+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "OP09-078_standard_PRB02",
+    "nom": "Gum Gum Gigant",
+    "numero": "OP09-078",
+    "set_id": "PRB02",
+    "set_nom": "PREMIUM BOOSTER - ONE PIECE CARD THE BEST VOL.2",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENTS",
+    "image_fichier": "OP09-078_standard.webp",
+    "image_locale": "images/OP09-078_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP09-078_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T20:39:18.719601+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero OP09-057 en version 'Standard' (canonique 'standard') existe deja sous le code Bandai OP09-057_standard_PRB02 dans le set PRB02. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (ST25 -> PRB02) - si ce sont deux impressions distinctes, la suppression est A TORT"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "OP09-057_standard_ST25",
+    "nom": "Cross Guild",
+    "numero": "OP09-057",
+    "set_id": "ST25",
+    "set_nom": "DECK POUR DÉMARRAGE - BLEU Baggy",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENT",
+    "image_fichier": "OP09-057_standard.webp",
+    "image_locale": "images/OP09-057_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP09-057_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-20T10:27:45.89576+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "OP09-057_standard_PRB02",
+    "nom": "Cross Guild",
+    "numero": "OP09-057",
+    "set_id": "PRB02",
+    "set_nom": "PREMIUM BOOSTER - ONE PIECE CARD THE BEST VOL.2",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENTS",
+    "image_fichier": "OP09-057_standard.webp",
+    "image_locale": "images/OP09-057_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP09-057_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T20:39:18.719601+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero OP09-020 en version 'Standard' (canonique 'standard') existe deja sous le code Bandai OP09-020_standard_PRB02 dans le set PRB02. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (ST23 -> PRB02) - si ce sont deux impressions distinctes, la suppression est A TORT"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "OP09-020_standard_ST23",
+    "nom": "Qu'ils viennent !! On les attend de pied ferme !!",
+    "numero": "OP09-020",
+    "set_id": "ST23",
+    "set_nom": "DECK DE DÉMARRAGE - ROUGE Shanks",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENT",
+    "image_fichier": "OP09-020_standard.webp",
+    "image_locale": "images/OP09-020_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP09-020_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-20T10:27:45.979293+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "OP09-020_standard_PRB02",
+    "nom": "Qu'ils viennent !! On les attend de pied ferme !!",
+    "numero": "OP09-020",
+    "set_id": "PRB02",
+    "set_nom": "PREMIUM BOOSTER - ONE PIECE CARD THE BEST VOL.2",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENTS",
+    "image_fichier": "OP09-020_standard.webp",
+    "image_locale": "images/OP09-020_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP09-020_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T20:39:18.719601+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero OP06-056 en version 'Standard' (canonique 'standard') existe deja sous le code Bandai OP06-056_standard_PRB02 dans le set PRB02. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (PRB01 -> PRB02) - si ce sont deux impressions distinctes, la suppression est A TORT"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "OP06-056_standard_PRB01",
+    "nom": "Épée céleste",
+    "numero": "OP06-056",
+    "set_id": "PRB01",
+    "set_nom": "PREMIUM BOOSTER - ONE PIECE CARD THE BEST",
+    "rarete": "UC",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENT",
+    "image_fichier": "OP06-056_standard.webp",
+    "image_locale": "images/OP06-056_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP06-056_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-20T10:27:45.979293+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "OP06-056_standard_PRB02",
+    "nom": "Épée céleste",
+    "numero": "OP06-056",
+    "set_id": "PRB02",
+    "set_nom": "PREMIUM BOOSTER - ONE PIECE CARD THE BEST VOL.2",
+    "rarete": "UC",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENTS",
+    "image_fichier": "OP06-056_standard.webp",
+    "image_locale": "images/OP06-056_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP06-056_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T20:39:18.719601+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero OP06-100 en version 'Standard' (canonique 'standard') existe deja sous le code Bandai OP06-100_standard_ST28 dans le set ST28. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (PRB01 -> ST28) - si ce sont deux impressions distinctes, la suppression est A TORT"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "OP06-100_standard_PRB01",
+    "nom": "Caborage",
+    "numero": "OP06-100",
+    "set_id": "PRB01",
+    "set_nom": "PREMIUM BOOSTER - ONE PIECE CARD THE BEST",
+    "rarete": "UC",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP06-100_standard.webp",
+    "image_locale": "images/OP06-100_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP06-100_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-20T10:27:45.979293+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "OP06-100_standard_ST28",
+    "nom": "Caborage",
+    "numero": "OP06-100",
+    "set_id": "ST28",
+    "set_nom": "DECK POUR DÉMARRAGE - VERT/JAUNE Yamato",
+    "rarete": "UC",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP06-100_standard.webp",
+    "image_locale": "images/OP06-100_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP06-100_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T21:55:47.98401+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero OP06-110 en version 'Standard' (canonique 'standard') existe deja sous le code Bandai OP06-110_standard_ST28 dans le set ST28. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (PRB01 -> ST28) - si ce sont deux impressions distinctes, la suppression est A TORT"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "OP06-110_standard_PRB01",
+    "nom": "Chavipère",
+    "numero": "OP06-110",
+    "set_id": "PRB01",
+    "set_nom": "PREMIUM BOOSTER - ONE PIECE CARD THE BEST",
+    "rarete": "UC",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP06-110_standard.webp",
+    "image_locale": "images/OP06-110_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP06-110_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-20T10:27:45.979293+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "OP06-110_standard_ST28",
+    "nom": "Chavipère",
+    "numero": "OP06-110",
+    "set_id": "ST28",
+    "set_nom": "DECK POUR DÉMARRAGE - VERT/JAUNE Yamato",
+    "rarete": "UC",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP06-110_standard.webp",
+    "image_locale": "images/OP06-110_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP06-110_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T21:55:47.98401+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero OP03-079 en version 'Standard' (canonique 'standard') existe deja sous le code Bandai OP03-079_standard_PRB01 dans le set PRB01. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (ST19 -> PRB01) - si ce sont deux impressions distinctes, la suppression est A TORT"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "OP03-079_standard_ST19",
+    "nom": "Vergo",
+    "numero": "OP03-079",
+    "set_id": "ST19",
+    "set_nom": "DECK POUR DÉBUTANT - NOIR Smoker",
+    "rarete": "UC",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP03-079_standard.webp",
+    "image_locale": "images/OP03-079_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP03-079_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-20T10:27:45.979293+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "OP03-079_standard_PRB01",
+    "nom": "Vergo",
+    "numero": "OP03-079",
+    "set_id": "PRB01",
+    "set_nom": "PREMIUM BOOSTER - ONE PIECE CARD THE BEST",
+    "rarete": "UC",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP03-079_standard.webp",
+    "image_locale": "images/OP03-079_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP03-079_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T20:52:04.778465+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero OP03-089 en version 'Standard' (canonique 'standard') existe deja sous le code Bandai OP03-089_standard_PRB01 dans le set PRB01. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (ST19 -> PRB01) - si ce sont deux impressions distinctes, la suppression est A TORT"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "OP03-089_standard_ST19",
+    "nom": "Brandnew",
+    "numero": "OP03-089",
+    "set_id": "ST19",
+    "set_nom": "DECK POUR DÉBUTANT - NOIR Smoker",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP03-089_standard.webp",
+    "image_locale": "images/OP03-089_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP03-089_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-20T10:27:45.979293+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "OP03-089_standard_PRB01",
+    "nom": "Brandnew",
+    "numero": "OP03-089",
+    "set_id": "PRB01",
+    "set_nom": "PREMIUM BOOSTER - ONE PIECE CARD THE BEST",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP03-089_standard.webp",
+    "image_locale": "images/OP03-089_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP03-089_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T20:52:04.778465+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero OP02-106 en version 'Standard' (canonique 'standard') existe deja sous le code Bandai OP02-106_standard_PRB01 dans le set PRB01. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (ST19 -> PRB01) - si ce sont deux impressions distinctes, la suppression est A TORT"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "OP02-106_standard_ST19",
+    "nom": "Tsuru",
+    "numero": "OP02-106",
+    "set_id": "ST19",
+    "set_nom": "DECK POUR DÉBUTANT - NOIR Smoker",
+    "rarete": "UC",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP02-106_standard.webp",
+    "image_locale": "images/OP02-106_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP02-106_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-20T10:27:45.979293+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "OP02-106_standard_PRB01",
+    "nom": "Tsuru",
+    "numero": "OP02-106",
+    "set_id": "PRB01",
+    "set_nom": "PREMIUM BOOSTER - ONE PIECE CARD THE BEST",
+    "rarete": "UC",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP02-106_standard.webp",
+    "image_locale": "images/OP02-106_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP02-106_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T20:52:04.778465+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero OP02-117 en version 'Standard' (canonique 'standard') existe deja sous le code Bandai OP02-117_standard_PRB01 dans le set PRB01. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (ST19 -> PRB01) - si ce sont deux impressions distinctes, la suppression est A TORT"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "OP02-117_standard_ST19",
+    "nom": "Ice Age",
+    "numero": "OP02-117",
+    "set_id": "ST19",
+    "set_nom": "DECK POUR DÉBUTANT - NOIR Smoker",
+    "rarete": "UC",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENT",
+    "image_fichier": "OP02-117_standard.webp",
+    "image_locale": "images/OP02-117_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP02-117_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-20T10:27:45.979293+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "OP02-117_standard_PRB01",
+    "nom": "Ice Age",
+    "numero": "OP02-117",
+    "set_id": "PRB01",
+    "set_nom": "PREMIUM BOOSTER - ONE PIECE CARD THE BEST",
+    "rarete": "UC",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "ÉVÉNEMENTS",
+    "image_fichier": "OP02-117_standard.webp",
+    "image_locale": "images/OP02-117_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP02-117_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T20:52:04.778465+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero OP03-003 en version 'Standard' (canonique 'standard') existe deja sous le code Bandai OP03-003_standard_PRB01 dans le set PRB01. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (ST15 -> PRB01) - si ce sont deux impressions distinctes, la suppression est A TORT"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "OP03-003_standard_ST15",
+    "nom": "Izo",
+    "numero": "OP03-003",
+    "set_id": "ST15",
+    "set_nom": "DECK POUR DÉBUTANT - ROUGE Edward Newgate",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP03-003_standard.webp",
+    "image_locale": "images/OP03-003_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP03-003_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-20T10:27:45.979293+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "OP03-003_standard_PRB01",
+    "nom": "Izo",
+    "numero": "OP03-003",
+    "set_id": "PRB01",
+    "set_nom": "PREMIUM BOOSTER - ONE PIECE CARD THE BEST",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP03-003_standard.webp",
+    "image_locale": "images/OP03-003_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP03-003_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T20:52:04.778465+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "SUPPRESSION",
+   "raison_script": "doublon inter-sets",
+   "raison_detaillee": "Doublon inter-sets : le numero OP02-018 en version 'Standard' (canonique 'standard') existe deja sous le code Bandai OP02-018_standard_PRB01 dans le set PRB01. Critere utilise : card_number + version canonique. Le set_id N'EST PAS compare, la rarete NON PLUS.",
+   "alertes": [
+    "SETS DIFFERENTS (ST15 -> PRB01) - si ce sont deux impressions distinctes, la suppression est A TORT"
+   ],
+   "carte_source": {
+    "role": "A_SUPPRIMER",
+    "id": "OP02-018_standard_ST15",
+    "nom": "Marco",
+    "numero": "OP02-018",
+    "set_id": "ST15",
+    "set_nom": "DECK POUR DÉBUTANT - ROUGE Edward Newgate",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP02-018_standard.webp",
+    "image_locale": "images/OP02-018_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP02-018_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-08-20T10:27:45.979293+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "carte_cible": {
+    "role": "CONSERVEE",
+    "id": "OP02-018_standard_PRB01",
+    "nom": "Marco",
+    "numero": "OP02-018",
+    "set_id": "PRB01",
+    "set_nom": "PREMIUM BOOSTER - ONE PIECE CARD THE BEST",
+    "rarete": "R",
+    "version": "Standard",
+    "version_canonique": "standard",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP02-018_standard.webp",
+    "image_locale": "images/OP02-018_standard.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP02-018_standard.webp",
+    "image_deja_en_ligne": true,
+    "scrape_le": "2026-07-06T20:52:04.778465+00:00",
+    "verrouillee": false,
+    "origine_probable": "Bandai"
+   }
+  },
+  {
+   "action": "REASSIGNATION",
+   "raison_script": "convention Bandai : card_number connu uniquement dans ce set",
+   "raison_detaillee": "Le numero ST32-002 n'est connu de Bandai que dans le set ST32. La ligne, classee dans OP17, y est deplacee. Nouvel identifiant : ST32-002_alternative_art_sp_ST32. Critere : card_number seul.",
+   "alertes": [
+    "La carte quitte OP17 pour ST32 - verifier que OP17 n'est pas son set d'impression reel"
+   ],
+   "carte_source": {
+    "role": "A_DEPLACER",
+    "id": "ST32-002_alternative_art_sp_OP17",
+    "nom": "Oden Kozuki",
+    "numero": "ST32-002",
+    "set_id": "OP17",
+    "set_nom": "Les Guerriers Les Plus Puissants Au Monde",
+    "rarete": "SR",
+    "version": "Alternative Art SP",
+    "version_canonique": "alternative art sp",
+    "type": "PERSONNAGE",
+    "image_fichier": "ST32-002_alternative_art_sp.webp",
+    "image_locale": "images/ST32-002_alternative_art_sp.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/ST32-002_alternative_art_sp.webp",
+    "image_deja_en_ligne": false,
+    "scrape_le": "2026-08-20T10:27:45.566656+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "cible": {
+    "set_id": "ST32",
+    "set_nom": "DECK POUR DÉBUTANT - VERT Roronoa Zoro",
+    "nouvel_id": "ST32-002_alternative_art_sp_ST32",
+    "version_conservee": "Alternative Art SP"
+   }
+  },
+  {
+   "action": "REASSIGNATION",
+   "raison_script": "convention Bandai : card_number connu uniquement dans ce set",
+   "raison_detaillee": "Le numero ST31-004 n'est connu de Bandai que dans le set ST31. La ligne, classee dans OP17, y est deplacee. Nouvel identifiant : ST31-004_alternative_art_sp_ST31. Critere : card_number seul.",
+   "alertes": [
+    "La carte quitte OP17 pour ST31 - verifier que OP17 n'est pas son set d'impression reel"
+   ],
+   "carte_source": {
+    "role": "A_DEPLACER",
+    "id": "ST31-004_alternative_art_sp_OP17",
+    "nom": "Monkey D. Luffy",
+    "numero": "ST31-004",
+    "set_id": "OP17",
+    "set_nom": "Les Guerriers Les Plus Puissants Au Monde",
+    "rarete": "SR",
+    "version": "Alternative Art SP",
+    "version_canonique": "alternative art sp",
+    "type": "PERSONNAGE",
+    "image_fichier": "ST31-004_alternative_art_sp.webp",
+    "image_locale": "images/ST31-004_alternative_art_sp.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/ST31-004_alternative_art_sp.webp",
+    "image_deja_en_ligne": false,
+    "scrape_le": "2026-08-20T10:27:45.566656+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "cible": {
+    "set_id": "ST31",
+    "set_nom": "DECK POUR DÉBUTANT - ROUGE Monkey D. Luffy",
+    "nouvel_id": "ST31-004_alternative_art_sp_ST31",
+    "version_conservee": "Alternative Art SP"
+   }
+  },
+  {
+   "action": "REASSIGNATION",
+   "raison_script": "convention Bandai : card_number connu uniquement dans ce set",
+   "raison_detaillee": "Le numero ST27-005 n'est connu de Bandai que dans le set ST27. La ligne, classee dans OP17, y est deplacee. Nouvel identifiant : ST27-005_alternative_art_sp_ST27. Critere : card_number seul.",
+   "alertes": [
+    "La carte quitte OP17 pour ST27 - verifier que OP17 n'est pas son set d'impression reel"
+   ],
+   "carte_source": {
+    "role": "A_DEPLACER",
+    "id": "ST27-005_alternative_art_sp_OP17",
+    "nom": "Marshall D. Teach",
+    "numero": "ST27-005",
+    "set_id": "OP17",
+    "set_nom": "Les Guerriers Les Plus Puissants Au Monde",
+    "rarete": "SR",
+    "version": "Alternative Art SP",
+    "version_canonique": "alternative art sp",
+    "type": "PERSONNAGE",
+    "image_fichier": "ST27-005_alternative_art_sp.webp",
+    "image_locale": "images/ST27-005_alternative_art_sp.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/ST27-005_alternative_art_sp.webp",
+    "image_deja_en_ligne": false,
+    "scrape_le": "2026-08-20T10:27:45.566656+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "cible": {
+    "set_id": "ST27",
+    "set_nom": "DECK POUR DÉMARRAGE - NOIR Marshall D. Teach",
+    "nouvel_id": "ST27-005_alternative_art_sp_ST27",
+    "version_conservee": "Alternative Art SP"
+   }
+  },
+  {
+   "action": "REASSIGNATION",
+   "raison_script": "convention Bandai : card_number connu uniquement dans ce set",
+   "raison_detaillee": "Le numero EB04-007 n'est connu de Bandai que dans le set OP15-EB04. La ligne, classee dans OP17, y est deplacee. Nouvel identifiant : EB04-007_alternative_art_sp_OP15-EB04. Critere : card_number seul.",
+   "alertes": [
+    "La carte quitte OP17 pour OP15-EB04 - verifier que OP17 n'est pas son set d'impression reel"
+   ],
+   "carte_source": {
+    "role": "A_DEPLACER",
+    "id": "EB04-007_alternative_art_sp_OP17",
+    "nom": "Roronoa Zoro",
+    "numero": "EB04-007",
+    "set_id": "OP17",
+    "set_nom": "Les Guerriers Les Plus Puissants Au Monde",
+    "rarete": "SR",
+    "version": "Alternative Art SP",
+    "version_canonique": "alternative art sp",
+    "type": "PERSONNAGE",
+    "image_fichier": "EB04-007_alternative_art_sp.webp",
+    "image_locale": "images/EB04-007_alternative_art_sp.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/EB04-007_alternative_art_sp.webp",
+    "image_deja_en_ligne": false,
+    "scrape_le": "2026-08-20T10:27:45.566656+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "cible": {
+    "set_id": "OP15-EB04",
+    "set_nom": "BOOSTER - AVENTURE SUR L'ÎLE DE DIEU",
+    "nouvel_id": "EB04-007_alternative_art_sp_OP15-EB04",
+    "version_conservee": "Alternative Art SP"
+   }
+  },
+  {
+   "action": "REASSIGNATION",
+   "raison_script": "convention Bandai : card_number connu uniquement dans ce set",
+   "raison_detaillee": "Le numero OP13-028 n'est connu de Bandai que dans le set OP13. La ligne, classee dans OP17, y est deplacee. Nouvel identifiant : OP13-028_alternative_art_sp_OP13. Critere : card_number seul.",
+   "alertes": [
+    "La carte quitte OP17 pour OP13 - verifier que OP17 n'est pas son set d'impression reel"
+   ],
+   "carte_source": {
+    "role": "A_DEPLACER",
+    "id": "OP13-028_alternative_art_sp_OP17",
+    "nom": "Shanks",
+    "numero": "OP13-028",
+    "set_id": "OP17",
+    "set_nom": "Les Guerriers Les Plus Puissants Au Monde",
+    "rarete": "SR",
+    "version": "Alternative Art SP",
+    "version_canonique": "alternative art sp",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP13-028_alternative_art_sp.webp",
+    "image_locale": "images/OP13-028_alternative_art_sp.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP13-028_alternative_art_sp.webp",
+    "image_deja_en_ligne": false,
+    "scrape_le": "2026-08-20T10:27:45.566656+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "cible": {
+    "set_id": "OP13",
+    "set_nom": "SUCCESSEURS",
+    "nouvel_id": "OP13-028_alternative_art_sp_OP13",
+    "version_conservee": "Alternative Art SP"
+   }
+  },
+  {
+   "action": "REASSIGNATION",
+   "raison_script": "convention Bandai : card_number connu uniquement dans ce set",
+   "raison_detaillee": "Le numero OP12-056 n'est connu de Bandai que dans le set OP12. La ligne, classee dans OP17, y est deplacee. Nouvel identifiant : OP12-056_alternative_art_sp_OP12. Critere : card_number seul.",
+   "alertes": [
+    "La carte quitte OP17 pour OP12 - verifier que OP17 n'est pas son set d'impression reel"
+   ],
+   "carte_source": {
+    "role": "A_DEPLACER",
+    "id": "OP12-056_alternative_art_sp_OP17",
+    "nom": "Monkey D. Garp",
+    "numero": "OP12-056",
+    "set_id": "OP17",
+    "set_nom": "Les Guerriers Les Plus Puissants Au Monde",
+    "rarete": "SR",
+    "version": "Alternative Art SP",
+    "version_canonique": "alternative art sp",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP12-056_alternative_art_sp.webp",
+    "image_locale": "images/OP12-056_alternative_art_sp.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP12-056_alternative_art_sp.webp",
+    "image_deja_en_ligne": false,
+    "scrape_le": "2026-08-20T10:27:45.566656+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "cible": {
+    "set_id": "OP12",
+    "set_nom": "L'HÉRITAGE DU MAÎTRE",
+    "nouvel_id": "OP12-056_alternative_art_sp_OP12",
+    "version_conservee": "Alternative Art SP"
+   }
+  },
+  {
+   "action": "REASSIGNATION",
+   "raison_script": "convention Bandai : card_number connu uniquement dans ce set",
+   "raison_detaillee": "Le numero EB04-061 n'est connu de Bandai que dans le set OP15-EB04. La ligne, classee dans OP17, y est deplacee. Nouvel identifiant : EB04-061_super_parallele_OP15-EB04. Critere : card_number seul.",
+   "alertes": [
+    "La carte quitte OP17 pour OP15-EB04 - verifier que OP17 n'est pas son set d'impression reel"
+   ],
+   "carte_source": {
+    "role": "A_DEPLACER",
+    "id": "EB04-061_super_parallele_OP17",
+    "nom": "Monkey D. Luffy",
+    "numero": "EB04-061",
+    "set_id": "OP17",
+    "set_nom": "Les Guerriers Les Plus Puissants Au Monde",
+    "rarete": "SEC",
+    "version": "Super Parallèle",
+    "version_canonique": "super parallele",
+    "type": "PERSONNAGE",
+    "image_fichier": "EB04-061_super_parallele.webp",
+    "image_locale": "images/EB04-061_super_parallele.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/EB04-061_super_parallele.webp",
+    "image_deja_en_ligne": false,
+    "scrape_le": "2026-08-20T10:27:45.566656+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "cible": {
+    "set_id": "OP15-EB04",
+    "set_nom": "BOOSTER - AVENTURE SUR L'ÎLE DE DIEU",
+    "nouvel_id": "EB04-061_super_parallele_OP15-EB04",
+    "version_conservee": "Super Parallèle"
+   }
+  },
+  {
+   "action": "REASSIGNATION",
+   "raison_script": "convention Bandai : card_number connu uniquement dans ce set",
+   "raison_detaillee": "Le numero OP16-098 n'est connu de Bandai que dans le set OP16. La ligne, classee dans OP17, y est deplacee. Nouvel identifiant : OP16-098_alternative_art_sp_OP16. Critere : card_number seul.",
+   "alertes": [
+    "La carte quitte OP17 pour OP16 - verifier que OP17 n'est pas son set d'impression reel"
+   ],
+   "carte_source": {
+    "role": "A_DEPLACER",
+    "id": "OP16-098_alternative_art_sp_OP17",
+    "nom": "Yamato",
+    "numero": "OP16-098",
+    "set_id": "OP17",
+    "set_nom": "Les Guerriers Les Plus Puissants Au Monde",
+    "rarete": "SR",
+    "version": "Alternative Art SP",
+    "version_canonique": "alternative art sp",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP16-098_alternative_art_sp.webp",
+    "image_locale": "images/OP16-098_alternative_art_sp.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP16-098_alternative_art_sp.webp",
+    "image_deja_en_ligne": false,
+    "scrape_le": "2026-08-20T10:27:45.566656+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "cible": {
+    "set_id": "OP16",
+    "set_nom": "BOOSTER - L'HEURE DE LA BATAILLE DÉCISIVE",
+    "nouvel_id": "OP16-098_alternative_art_sp_OP16",
+    "version_conservee": "Alternative Art SP"
+   }
+  },
+  {
+   "action": "REASSIGNATION",
+   "raison_script": "convention Bandai : card_number connu uniquement dans ce set",
+   "raison_detaillee": "Le numero P-107 n'est connu de Bandai que dans le set SCP25-2. La ligne, classee dans OP17, y est deplacee. Nouvel identifiant : P-107_alternative_art_sp_SCP25-2. Critere : card_number seul.",
+   "alertes": [
+    "La carte quitte OP17 pour SCP25-2 - verifier que OP17 n'est pas son set d'impression reel"
+   ],
+   "carte_source": {
+    "role": "A_DEPLACER",
+    "id": "P-107_alternative_art_sp_OP17",
+    "nom": "Gol D. Roger",
+    "numero": "P-107",
+    "set_id": "OP17",
+    "set_nom": "Les Guerriers Les Plus Puissants Au Monde",
+    "rarete": "P",
+    "version": "Alternative Art SP",
+    "version_canonique": "alternative art sp",
+    "type": "PERSONNAGE",
+    "image_fichier": "P-107_alternative_art_sp.webp",
+    "image_locale": "images/P-107_alternative_art_sp.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/P-107_alternative_art_sp.webp",
+    "image_deja_en_ligne": false,
+    "scrape_le": "2026-08-20T10:27:45.566656+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "cible": {
+    "set_id": "SCP25-2",
+    "set_nom": "Set de cartes promotionnelles 2025 Vol.2",
+    "nouvel_id": "P-107_alternative_art_sp_SCP25-2",
+    "version_conservee": "Alternative Art SP"
+   }
+  },
+  {
+   "action": "REASSIGNATION",
+   "raison_script": "convention Bandai : card_number connu uniquement dans ce set",
+   "raison_detaillee": "Le numero OP05-067 n'est connu de Bandai que dans le set ST18. La ligne, classee dans OP09, y est deplacee. Nouvel identifiant : OP05-067_special_card_ST18. Critere : card_number seul.",
+   "alertes": [
+    "La carte quitte OP09 pour ST18 - verifier que OP09 n'est pas son set d'impression reel"
+   ],
+   "carte_source": {
+    "role": "A_DEPLACER",
+    "id": "OP05-067_special_card_OP09",
+    "nom": "Zorojuro",
+    "numero": "OP05-067",
+    "set_id": "OP09",
+    "set_nom": "LES NOUVEAUX EMPEREURS",
+    "rarete": "R",
+    "version": "Special Card",
+    "version_canonique": "alternative art 2",
+    "type": "PERSONNAGE",
+    "image_fichier": "OP05-067_special_card.webp",
+    "image_locale": "images/OP05-067_special_card.webp",
+    "image_url": "https://tanuki-poneglyph.pages.dev/images/OP05-067_special_card.webp",
+    "image_deja_en_ligne": false,
+    "scrape_le": "2026-08-20T10:27:45.979293+00:00",
+    "verrouillee": false,
+    "origine_probable": "opecards / édition manuelle"
+   },
+   "cible": {
+    "set_id": "ST18",
+    "set_nom": "DECK POUR DÉBUTANT - VIOLET Monkey D. Luffy",
+    "nouvel_id": "OP05-067_special_card_ST18",
+    "version_conservee": "Special Card"
+   }
+  }
+ ]
+}

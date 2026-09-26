@@ -301,24 +301,30 @@ def get_supabase():
     return create_client(url, key)
 
 
-def fetch_existing(sb) -> tuple[set[tuple[str, str, str]], set[str], int]:
-    """Triplets (card_number, version, set_id) existants + set_ids + total."""
+def fetch_existing(sb) -> tuple[set[tuple[str, str, str]], set[str], set[str], int]:
+    """(triplets existants, ids verrouillés, set_ids, total).
+
+    Les ids verrouillés (locked=true) ne sont jamais réécrits : une carte
+    corrigée à la main en BDD ne doit pas être réécrasée par le scraper."""
     triplets: set[tuple[str, str, str]] = set()
+    locked_ids: set[str] = set()
     offset, page = 0, 1000
     while True:
         res = (
             sb.table("poneglyph_cards")
-            .select("card_number,version,set_id")
+            .select("id,card_number,version,set_id,locked")
             .range(offset, offset + page - 1)
             .execute()
         )
         for r in res.data:
             triplets.add((r["card_number"], r["version"], r["set_id"]))
+            if r.get("locked"):
+                locked_ids.add(r["id"])
         if len(res.data) < page:
             break
         offset += page
     sets = {r["set_id"] for r in sb.table("poneglyph_sets").select("set_id").execute().data}
-    return triplets, sets, len(triplets)
+    return triplets, locked_ids, sets, len(triplets)
 
 
 def upsert(sb, table: str, rows: list[dict], on_conflict: str, chunk: int = 200):
@@ -394,12 +400,15 @@ def main() -> int:
     args = ap.parse_args()
 
     sb = None if args.dry_run else get_supabase()
-    existing, existing_sets, db_total = (set(), set(), 0) if sb is None else fetch_existing(sb)
-    log.info("BDD : %d cartes, %d sets", db_total, len(existing_sets))
+    existing, locked_ids, existing_sets, db_total = (
+        (set(), set(), set(), 0) if sb is None else fetch_existing(sb))
+    log.info("BDD : %d cartes, %d sets, %d verrouillée(s) (locked)",
+             db_total, len(existing_sets), len(locked_ids))
 
     report: dict = {"source": "opecards.fr", "ok": True, "warnings": [], "added": []}
     added_cards: list[dict] = []
     skipped = 0
+    locked_skipped: list[str] = []
     opecards_total = 0
     per_set_opecards: dict[str, int] = {}
 
@@ -495,6 +504,13 @@ def main() -> int:
             log.warning("%d doublon(s) d'id supprimé(s)", len(added_cards) - len(deduped))
             added_cards = deduped
 
+        # exclure les cartes verrouillées : corrigées à la main en BDD, elles ne
+        # doivent pas être réécrites (ni voir leur image re-téléchargée ensuite).
+        locked_skipped = sorted(c["id"] for c in added_cards if c["id"] in locked_ids)
+        if locked_skipped:
+            log.info("%d carte(s) locked skippée(s) de l'upsert", len(locked_skipped))
+            added_cards = [c for c in added_cards if c["id"] not in locked_ids]
+
         # 4) images manquantes (via le contexte navigateur, requests étant bloqué)
         images_downloaded = 0
         if not args.skip_images:
@@ -585,6 +601,8 @@ def main() -> int:
         "added_championship": len(championship),
         "images_downloaded": images_downloaded,
         "skipped_existing": skipped,
+        "locked_skipped_count": len(locked_skipped),
+        "locked_skipped": locked_skipped,
         "new_sets": new_sets,
         "added": sorted(c["id"] for c in added_cards),
     })

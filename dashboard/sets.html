@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sets — Ponéglyphe</title>
+<link rel="stylesheet" href="/dashboard/tanuki.css">
+<script src="/dashboard/session.js" defer></script>
+<style>
+  body{height:100vh;display:flex;flex-direction:column;overflow:hidden}
+  main{flex:1;overflow-y:auto;padding:22px 24px 60px}
+  .inner{max-width:1080px;margin:0 auto}
+  .head{display:flex;align-items:flex-end;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+  .head h2{margin:0;font-family:var(--display);font-size:30px;letter-spacing:.02em;
+           text-transform:uppercase;line-height:1}
+
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+     text-transform:uppercase;color:var(--muted);font-weight:400;
+     padding:0 11px 9px;border-bottom:1px solid var(--border)}
+  th.r,td.r{text-align:right}
+  td{padding:10px 11px;border-bottom:1px solid var(--border);font-size:13.5px}
+  tbody tr{cursor:pointer}
+  tbody tr:hover td{background:var(--surface)}
+  .code{font-family:var(--mono);font-size:12.5px;letter-spacing:.05em}
+  .nm{color:var(--muted2);font-size:13px}
+  .num{font-family:var(--mono);font-size:12.5px;color:var(--muted2)}
+  .num b{color:var(--text);font-weight:400}
+  .st{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+  .st.ok{color:var(--accent)} .st.na{color:var(--muted)} .st.gap{color:var(--text)}
+  .lk{color:var(--accent);font-family:var(--mono);font-size:10.5px}
+
+  .ovl{position:fixed;inset:0;background:rgba(5,5,9,.66);display:flex;justify-content:flex-end;z-index:50}
+  .ovl[hidden]{display:none}
+  .pan{width:min(520px,100%);background:var(--bg);border-left:1px solid var(--border);
+       display:flex;flex-direction:column;height:100%}
+  .pan .top{padding:14px 20px;border-bottom:1px solid var(--border);background:var(--surface);
+            display:flex;gap:12px;align-items:center}
+  .pan .top h3{margin:0;font-family:var(--display);font-size:22px;letter-spacing:.03em;
+               text-transform:uppercase;flex:1;line-height:1.1}
+  .pan .bd{flex:1;overflow-y:auto;padding:18px 20px 28px}
+  .pan .ft{padding:13px 20px;border-top:1px solid var(--border);background:var(--surface);
+           display:flex;gap:9px;align-items:center}
+  .idbox{font-family:var(--mono);font-size:11px;color:var(--muted2);
+         border:1px solid var(--border);border-radius:3px;padding:9px 11px;margin-bottom:16px;
+         background:var(--surface)}
+  .idbox b{color:var(--text);font-weight:400}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+  .msg{padding:9px 12px;border-radius:3px;font-family:var(--mono);font-size:11.5px;
+       margin-bottom:14px;letter-spacing:.04em}
+  .msg.good{border:1px solid var(--accent);color:var(--accent);background:var(--accent-dim)}
+  .msg.bad{border:1px solid #e8918c;color:#e8918c}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">TANUKI</div>
+  <span class="meta" style="letter-spacing:.12em">/ OP-TCG API</span>
+  <span class="chip">Database</span>
+  <nav class="nav">
+    <a href="/dashboard/editor.html">01 / Editor</a>
+    <a href="/dashboard/cleanup-review.html">02 / Cleanup</a>
+    <a href="/dashboard/index.html">03 / Dashboard</a>
+    <a href="/dashboard/sets.html" class="on">04 / Sets</a>
+  </nav>
+  <button id="logout" class="ghost">Sortir</button>
+  <div class="cmd" style="min-width:250px">
+    <span class="sigil">⌕</span>
+    <input type="search" id="q" placeholder="Filter sets...">
+    <span class="kbd" id="kbdHint">CTRL K</span>
+  </div>
+  <span class="grow"></span>
+  <span class="meta" id="tot"></span>
+  <button id="btnNew" class="primary">+ New set</button>
+</div>
+
+<main><div class="inner">
+  <div class="head">
+    <h2>Sets</h2>
+    <span class="meta" id="sub"></span>
+  </div>
+  <table>
+    <thead><tr>
+      <th>Set</th><th>Nom</th><th>Type</th><th>Sortie</th>
+      <th class="r">Base / attendu</th><th class="r">État</th>
+    </tr></thead>
+    <tbody id="rows"><tr><td colspan="6"><div class="empty">Chargement…</div></td></tr></tbody>
+  </table>
+</div></main>
+
+<div class="ovl" id="ovl" hidden>
+  <div class="pan">
+    <div class="top">
+      <h3 id="panTitle">Set</h3>
+      <button id="btnClose" class="ghost">Close</button>
+    </div>
+    <div class="bd" id="panBody"></div>
+    <div class="ft reveal">
+      <button id="btnSave" class="primary">Save changes</button>
+      <span class="grow"></span>
+      <button id="btnDel" class="quiet">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $  = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c =>
+  ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+let SETS = [], EDITING = null, MODE = "edit", query = "";
+
+async function api(path, opts){
+  const r = await fetch(path, opts);
+  const j = await r.json().catch(() => ({error:"réponse illisible"}));
+  if(!r.ok){ const e = new Error(j.error || ("HTTP " + r.status)); e.data = j; throw e; }
+  return j;
+}
+function toast(msg, bad){
+  const t = document.createElement("div");
+  t.className = "toast" + (bad ? " bad" : "");
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 4600);
+}
+
+async function load(){
+  const d = await api("/api/sets");
+  SETS = d.sets;
+  $("#tot").textContent = `${d.total_cartes} cartes · ${SETS.length} sets`;
+  render();
+}
+
+function render(){
+  const vis = SETS.filter(s => !query ||
+    (s.set_id + " " + s.name + " " + s.set_type).toLowerCase().includes(query));
+  const vides = vis.filter(s => !s.cards_en_base).length;
+  $("#sub").innerHTML = `<b style="color:var(--text)">${vis.length}</b> affiché(s)` +
+    (vides ? ` · ${vides} sans aucune carte` : "");
+
+  $("#rows").innerHTML = vis.map((s,i) => {
+    const known = s.card_count != null;
+    const etat = !known ? `<span class="st na">non chiffré</span>`
+      : s.cards_en_base === s.card_count ? `<span class="st ok">complet</span>`
+      : s.cards_en_base > s.card_count
+        ? `<span class="st gap">+${s.cards_en_base - s.card_count}</span>`
+        : `<span class="st gap">−${s.card_count - s.cards_en_base}</span>`;
+    return `<tr data-set="${esc(s.set_id)}">
+      <td><span class="code">${esc(s.set_id)}</span></td>
+      <td><span class="nm">${esc(s.name)}</span>${
+        s.cards_verrouillees ? ` <span class="lk">${s.cards_verrouillees}🔒</span>` : ""}</td>
+      <td><span class="num">${esc(s.set_type)}</span></td>
+      <td><span class="num">${s.release_date ? esc(s.release_date) : "—"}</span></td>
+      <td class="r"><span class="num"><b>${s.cards_en_base}</b> / ${
+        known ? s.card_count : "—"}</span></td>
+      <td class="r">${etat}</td></tr>`;
+  }).join("") || `<tr><td colspan="6"><div class="empty">Aucun set</div></td></tr>`;
+
+  $("#rows").querySelectorAll("tr[data-set]").forEach(tr =>
+    tr.onclick = () => openEditor(SETS.find(x => x.set_id === tr.dataset.set)));
+}
+
+function field(key, label, val, type, hint){
+  return `<div class="field"><label class="label">${label}</label>
+    <input type="${type||"text"}" name="${key}" value="${esc(val)}">
+    ${hint ? `<div class="hint">${hint}</div>` : ""}</div>`;
+}
+
+function openEditor(s){
+  MODE = "edit"; EDITING = s;
+  $("#panTitle").textContent = s.set_id;
+  $("#btnDel").hidden = false;
+  renderForm(s);
+  $("#ovl").hidden = false;
+}
+
+function openNew(){
+  MODE = "create"; EDITING = {};
+  $("#panTitle").textContent = "New set";
+  $("#btnDel").hidden = true;
+  renderForm({});
+  $("#ovl").hidden = false;
+}
+
+function renderForm(s){
+  const n = s.cards_en_base;
+  $("#panBody").innerHTML = `
+    <div id="msg"></div>
+    ${MODE === "edit" ? `<div class="idbox">
+      <span class="label">Contenu réel</span><br>
+      <b>${n}</b> carte(s) rattachée(s) à ce set${
+        s.cards_verrouillees ? ` · <b>${s.cards_verrouillees}</b> verrouillée(s)` : ""}
+      </div>` : ""}
+
+    ${field("set_id", "Set ID", s.set_id, "text",
+       MODE === "edit"
+         ? "Clé primaire, encodée dans l'identifiant de chaque carte. Renommable uniquement si le set est vide."
+         : "Sans espace. Ex : OP17, ST31, PRB03.")}
+    ${field("name", "Nom", s.name)}
+    <div class="cols">
+      ${field("set_type", "Type", s.set_type, "text", "OP, ST, EB, PRB, PROMO…")}
+      ${field("release_date", "Date de sortie", s.release_date, "date")}
+    </div>
+    ${field("card_count", "Total attendu", s.card_count, "number",
+       "Nombre de cartes attendu, utilisé par le scraper pour valider. Vide = non chiffré.")}`;
+}
+
+function collect(){
+  const out = {};
+  $("#panBody").querySelectorAll("[name]").forEach(el => out[el.name] = el.value);
+  return out;
+}
+function showMsg(t, bad){
+  $("#msg").innerHTML = `<div class="msg ${bad ? "bad" : "good"}">${esc(t)}</div>`;
+}
+
+async function save(){
+  const payload = collect();
+  $("#btnSave").disabled = true;
+  try{
+    const r = MODE === "create"
+      ? await api("/api/set", {method:"POST",
+          headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)})
+      : await api("/api/set?id=" + encodeURIComponent(EDITING.set_id), {method:"PUT",
+          headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload)});
+    toast(r.message);
+    $("#ovl").hidden = true;
+    await load();
+  }catch(e){ showMsg(e.message, true); }
+  finally{ $("#btnSave").disabled = false; }
+}
+
+/* Le compte de cartes est lu depuis la liste deja chargee : l'appel reseau n'est
+   declenche qu'APRES accord, jamais pour "decouvrir" l'impact. Le serveur refuse
+   de toute facon un set peuple sans cascade explicite : deuxieme filet. */
+async function removeSafe(){
+  const sid = EDITING.set_id;
+  const n = EDITING.cards_en_base;
+  if(n === 0){
+    if(!confirm(`Supprimer le set ${sid} ?\n\nIl ne contient aucune carte.`)) return;
+    try{
+      const r = await api("/api/set?id=" + encodeURIComponent(sid), {method:"DELETE"});
+      toast(r.message); $("#ovl").hidden = true; await load();
+    }catch(e){ showMsg(e.message, true); }
+    return;
+  }
+  if(!confirm(`Le set ${sid} contient ${n} carte(s).\n\n`
+            + `Continuer supprimera le set ET ses ${n} carte(s) de la base.\n`
+            + `Les fichiers image ne sont pas touchés.\n\n`
+            + `Cette action est irréversible. Confirmer ?`)) {
+    return toast("Suppression annulée — rien n'a été fait.", true);
+  }
+  if(!confirm(`Dernière confirmation : supprimer ${sid} et ses ${n} carte(s) ?`)){
+    return toast("Suppression annulée — rien n'a été fait.", true);
+  }
+  try{
+    const r = await api("/api/set?id=" + encodeURIComponent(sid) + "&cascade=1",
+                        {method:"DELETE"});
+    toast(r.message); $("#ovl").hidden = true; await load();
+  }catch(e){ showMsg(e.message, true); }
+}
+
+$("#btnNew").onclick   = openNew;
+$("#btnClose").onclick = () => $("#ovl").hidden = true;
+$("#btnSave").onclick  = save;
+$("#btnDel").onclick   = removeSafe;
+$("#ovl").onclick = e => { if(e.target.id === "ovl") $("#ovl").hidden = true; };
+$("#q").oninput = e => { query = e.target.value.toLowerCase().trim(); render(); };
+
+if(navigator.platform && /mac/i.test(navigator.platform)) $("#kbdHint").textContent = "⌘ K";
+document.onkeydown = e => {
+  if(e.key === "Escape") $("#ovl").hidden = true;
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){
+    e.preventDefault(); $("#q").focus(); $("#q").select();
+  }
+};
+
+load().catch(e => $("#rows").innerHTML =
+  `<tr><td colspan="6"><div class="empty">${esc(e.message)} — run python dashboard/server.py</div></td></tr>`);
+</script>
+</body>
+</html>

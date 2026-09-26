@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cleanup review — Ponéglyphe</title>
+<link rel="stylesheet" href="/dashboard/tanuki.css">
+<script src="/dashboard/session.js" defer></script>
+<style>
+  body{height:100vh;display:flex;flex-direction:column;overflow:hidden}
+  .hdr{padding:16px 22px 0;border-bottom:1px solid var(--border);background:var(--surface)}
+  .counts{display:flex;gap:40px;align-items:flex-end;margin:12px 0 14px;flex-wrap:wrap}
+  .counts .c .n{font-family:var(--display);font-size:46px;line-height:.86;letter-spacing:.01em}
+  .counts .c .n.del{color:#e8918c}
+  .counts .c .n.accent{color:var(--accent)}
+  .counts .c .k{margin-top:5px}
+  .counts .tally{font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.8;
+                 letter-spacing:.06em;text-transform:uppercase}
+  .counts .tally b{color:var(--text);font-weight:400}
+  .counts .tally .a{color:var(--accent)}
+  .toolbar{display:flex;gap:12px;align-items:center;padding-bottom:0;flex-wrap:wrap}
+  .filters button:before{content:"";display:inline-block;width:4px;height:4px;border-radius:50%;
+                         background:transparent;margin-right:6px;vertical-align:middle}
+  .filters button.on:before{background:var(--accent)}
+
+  main{flex:1;overflow-y:auto;padding:16px 22px 60px}
+  table{width:100%;border-collapse:collapse}
+  thead th{position:sticky;top:0;background:var(--bg);z-index:3;
+     text-align:left;font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+     text-transform:uppercase;color:var(--muted);font-weight:400;
+     padding:0 10px 9px;border-bottom:1px solid var(--border)}
+  td{padding:10px;border-bottom:1px solid var(--border);vertical-align:top}
+  tr.row.risk td{background:rgba(200,240,96,.035)}
+  tr.row.risk td:first-child{box-shadow:inset 2px 0 0 var(--accent)}
+  tr.row.rejected{opacity:.4}
+  tr.row:hover td{background:var(--surface)}
+  tr.row.risk:hover td{background:rgba(200,240,96,.06)}
+
+  .item{display:flex;gap:10px;align-items:flex-start;min-width:0}
+  .item img,.sug img{width:44px;border:1px solid var(--border);background:#07070b;
+                     aspect-ratio:5/7;object-fit:contain;flex:none}
+  .item .noimg,.sug .noimg{width:44px;aspect-ratio:5/7;border:1px dashed var(--border);flex:none}
+  .item .num{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.05em}
+  .item .nm{font-size:13px;font-weight:500;line-height:1.3;margin-top:1px}
+  .item .mt{font-family:var(--mono);font-size:10px;color:var(--muted2);margin-top:2px;
+            letter-spacing:.07em;text-transform:uppercase}
+  .act{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase}
+  .act.del{color:#e8918c} .act.mv{color:var(--accent)}
+  .sub{font-size:11.5px;color:var(--muted);margin-top:3px;line-height:1.4}
+  .sug{display:flex;gap:9px;align-items:flex-start;min-width:0}
+  .sug .id{font-family:var(--mono);font-size:11px;color:var(--text);word-break:break-all;
+           line-height:1.4}
+  .why{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+       color:var(--muted2)}
+  .why.risk{color:var(--accent)}
+  .why.diff{color:var(--text)}
+  .reasontxt{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.45;max-width:36ch}
+  .stat{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+        color:var(--muted)}
+  .stat.yes{color:var(--accent)} .stat.no{color:#e8918c}
+  .choice{display:flex;gap:7px;justify-content:flex-end}
+  .choice button{padding:6px 12px}
+  .choice .yes.on{background:var(--accent);color:#0b0f04;border-color:var(--accent);font-weight:500}
+  .choice .no.on{color:#e8918c;border-color:rgba(232,145,140,.45)}
+  .sameimg{font-family:var(--mono);font-size:9.5px;color:var(--muted);margin-top:5px;
+           letter-spacing:.04em;line-height:1.45}
+  .note{margin-bottom:14px}
+  .note .amb{font-family:var(--mono);font-size:11px;margin-top:8px;color:var(--muted2)}
+  #more{display:block;margin:20px auto}
+  .tag.risk{border-color:rgba(200,240,96,.35);color:var(--accent);background:var(--accent-dim)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">TANUKI</div>
+  <span class="meta" style="letter-spacing:.12em">/ OP-TCG API</span>
+  <span class="chip">Database</span>
+  <span class="grow"></span>
+  <div class="status"><span class="led"></span>Review mode — nothing is applied here</div>
+  <nav class="nav">
+    <a href="/dashboard/editor.html">01 / Editor</a>
+    <a href="/dashboard/cleanup-review.html" class="on">02 / Cleanup</a>
+    <a href="/dashboard/index.html">03 / Dashboard</a>
+    <a href="/dashboard/sets.html">04 / Sets</a>
+  </nav>
+  <button id="logout" class="ghost">Sortir</button>
+</div>
+
+<div class="hdr">
+  <div class="numtitle"><span class="n">02</span><span class="sl">/</span>
+    <span class="t">Cleanup review</span></div>
+  <div class="counts" id="stats"><div class="c"><div class="n">…</div></div></div>
+  <div class="toolbar">
+    <div class="filters">
+      <button data-f="all" class="on">All</button>
+      <button data-f="pending">Review</button>
+      <button data-f="risk">Risk</button>
+      <button data-f="diffimg">Image diff</button>
+      <button data-f="approved">Approved</button>
+      <button data-f="rejected">Rejected</button>
+      <button data-f="del">Delete</button>
+      <button data-f="mv">Reassign</button>
+    </div>
+    <span class="grow"></span>
+    <div class="cmd" style="min-width:250px">
+      <span class="sigil">⌕</span>
+      <input type="search" id="q" placeholder="Search... (number, name, set)">
+    </div>
+    <button id="refresh" class="ghost">↻ Actualiser</button>
+    <button id="allYes" class="ghost">Approve view</button>
+    <button id="allNo" class="ghost">Reject view</button>
+    <button id="export">↥ Export selection</button>
+  </div>
+</div>
+
+<main>
+  <div class="notice note" id="intro">
+    <b>Les entrées démarrent approuvées</b>, sauf les cas à risque — surlignés lime — qui
+    démarrent non tranchés et restent exclus de l'export tant que vous ne les avez pas cochés.
+    Vos choix sont conservés dans le navigateur.<br><br>
+    <b>Limite de la comparaison visuelle :</b> le nom de fichier image est bâti sur
+    <span class="mono">numéro + version</span>, sans le set. Sur la plupart des suppressions les
+    deux vignettes sont le même fichier et ne prouvent rien — c'est signalé dans la colonne
+    SUGGESTED. Le filtre <b>Image diff</b> isole les cas discriminants.<br><br>
+    <b>Export :</b> produit <span class="mono">cleanup-approuve.json</span>, à passer à
+    <span class="mono">python scraper/cleanup.py --cutoff "2026-08-20T00:00:00+00:00"
+    --only-ids cleanup-approuve.json --apply</span>.
+  </div>
+  <div id="ambig"></div>
+  <table>
+    <thead><tr>
+      <th style="width:24%">Item</th><th style="width:15%">Current</th>
+      <th style="width:22%">Suggested</th><th style="width:20%">Reason</th>
+      <th style="width:8%">Status</th><th style="width:11%"></th>
+    </tr></thead>
+    <tbody id="list"></tbody>
+  </table>
+  <button id="more" hidden>Afficher la suite</button>
+</main>
+
+<script>
+const PAGE = 60;
+let DATA = null, ROWS = [], STATE = {}, filter = "all", query = "", shown = PAGE;
+const KEY = "poneglyph-cleanup-review";
+const FPKEY = "poneglyph-cleanup-fingerprints";
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "—").replace(/[&<>"]/g, c =>
+  ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function toast(msg, bad){
+  const t = document.createElement("div");
+  t.className = "toast" + (bad ? " bad" : "");
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 5200);
+}
+
+/* Empreinte d'une entree : si elle change, la decision prise sur l'ancienne
+   version n'a plus de sens et l'entree repart au defaut. */
+function empreinte(r){
+  const cible = r.a.action === "SUPPRESSION"
+    ? (r.a.carte_cible || {}).id : (r.a.cible || {}).nouvel_id;
+  return [r.a.action, r.a.raison_script, cible].join("|");
+}
+
+async function charger(){
+  const r = await fetch("../AUDIT-CLEANUP-DETAIL.json?t=" + Date.now(), {cache: "no-store"});
+  if(!r.ok) throw new Error("HTTP " + r.status);
+  init(await r.json());
+}
+
+charger().catch(e => {
+  $("#list").innerHTML = `<tr><td colspan="6"><div class="empty">
+    AUDIT-CLEANUP-DETAIL.json introuvable (${esc(e.message)})</div></td></tr>`;
+});
+
+/* Recalcul serveur : dry-run de la meme logique que cleanup.py contre l'etat
+   actuel de la base. Pas de fusion avec l'ancienne liste, un recalcul complet :
+   ce qui a ete resolu a la main disparait de lui-meme. */
+async function actualiser(){
+  if(!confirm("Recalculer le plan contre l'état actuel de la base ?\n\n"
+            + "Aucune écriture : c'est un dry-run de la même logique que cleanup.py.\n"
+            + "Les entrées déjà résolues à la main disparaîtront de la liste.\n"
+            + "Vos décisions sont conservées pour les entrées restées identiques.")) return;
+  const b = $("#refresh");
+  b.disabled = true; b.textContent = "Recalcul…";
+  const avant = ROWS.length;
+  try{
+    const r = await fetch("/api/cleanup-refresh", {method: "POST"});
+    const j = await r.json().catch(() => ({}));
+    if(!r.ok) throw new Error(j.error || ("HTTP " + r.status));
+    await charger();
+    const d = avant - ROWS.length;
+    toast(`Recalcul terminé : ${ROWS.length} action(s)` +
+          (d > 0 ? ` — ${d} entrée(s) en moins qu'avant` :
+           d < 0 ? ` — ${-d} de plus qu'avant` : " — inchangé") +
+          (j.protegees_car_verrouillees
+            ? ` · ${j.protegees_car_verrouillees} protégée(s) car verrouillée(s)` : ""));
+  }catch(e){
+    toast("Recalcul impossible : " + e.message, true);
+  }finally{
+    b.disabled = false; b.textContent = "↻ Actualiser";
+  }
+}
+
+function init(d){
+  DATA = d;
+  const risky = new Set((d.suppressions_a_risque||[]).map(x => x.supprimee.id));
+  ROWS = (d.actions||[]).map((a,i) => ({
+    i, a,
+    id: a.carte_source.id,
+    risk: risky.has(a.carte_source.id),
+    // le nom de fichier image = numero + version, sans le set : deux lignes de
+    // sets differents partagent donc souvent la MEME image, et la comparaison
+    // visuelle ne prouve alors rien.
+    sameImg: a.action === "SUPPRESSION"
+      && a.carte_source.image_fichier === (a.carte_cible || {}).image_fichier,
+    hay: [a.carte_source.numero, a.carte_source.nom, a.carte_source.set_id,
+          a.carte_source.set_nom, a.carte_source.version, a.carte_source.rarete,
+          a.action].join(" ").toLowerCase(),
+  }));
+
+  let saved = null, savedFp = null;
+  try { saved = JSON.parse(localStorage.getItem(KEY) || "null"); } catch {}
+  try { savedFp = JSON.parse(localStorage.getItem(FPKEY) || "null"); } catch {}
+  const legacy = !savedFp;   // premiere ouverture depuis l'ajout des empreintes
+
+  STATE = {};
+  const fps = {};
+  ROWS.forEach(r => {
+    const fp = empreinte(r);
+    fps[r.id] = fp;
+    // decision reprise seulement si l'entree est restee strictement identique
+    const inchangee = saved && saved[r.id] !== undefined
+                      && (legacy || savedFp[r.id] === fp);
+    STATE[r.id] = inchangee ? saved[r.id]
+                            : (r.risk ? null : true);  // defaut de la generation initiale
+  });
+  try { localStorage.setItem(FPKEY, JSON.stringify(fps)); } catch {}
+  save();   // reecrit STATE sans les ids disparus
+
+  renderAmbiguous();
+  bind();
+  render();
+}
+
+function bind(){
+  document.querySelectorAll("[data-f]").forEach(b => b.onclick = () => {
+    document.querySelectorAll("[data-f]").forEach(x => x.classList.remove("on"));
+    b.classList.add("on"); filter = b.dataset.f; shown = PAGE; render();
+  });
+  $("#q").oninput = e => { query = e.target.value.toLowerCase().trim(); shown = PAGE; render(); };
+  $("#more").onclick = () => { shown += PAGE; render(); };
+  $("#allYes").onclick = () => bulk(true);
+  $("#allNo").onclick  = () => bulk(false);
+  $("#export").onclick = exportSel;
+  $("#refresh").onclick = actualiser;
+  document.onkeydown = e => {
+    if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){
+      e.preventDefault(); $("#q").focus(); $("#q").select();
+    }
+  };
+}
+
+function bulk(v){
+  const vis = visible();
+  if(!vis.length) return;
+  if(!confirm(`Appliquer « ${v ? "approuvé" : "rejeté"} » aux ${vis.length} entrées affichées ?`)) return;
+  vis.forEach(r => STATE[r.id] = v);
+  save(); render();
+}
+
+function visible(){
+  return ROWS.filter(r => {
+    const st = STATE[r.id];
+    if(filter === "pending"   && st !== null) return false;
+    if(filter === "risk"      && !r.risk)     return false;
+    if(filter === "approved"  && st !== true) return false;
+    if(filter === "rejected"  && st !== false)return false;
+    if(filter === "diffimg"   && (r.sameImg || r.a.action !== "SUPPRESSION")) return false;
+    if(filter === "del" && r.a.action !== "SUPPRESSION")   return false;
+    if(filter === "mv"  && r.a.action !== "REASSIGNATION") return false;
+    if(query && !r.hay.includes(query)) return false;
+    return true;
+  });
+}
+
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(STATE)); } catch {} }
+
+function thumb(c){
+  return c && c.image_locale
+    ? `<img loading="lazy" src="../${esc(c.image_locale)}" alt="${esc(c.numero)}">`
+    : `<div class="noimg"></div>`;
+}
+
+function reasonTag(r){
+  const a = r.a;
+  if(r.risk) return `<span class="tag risk">! High risk</span>`;
+  if(a.action === "REASSIGNATION") return `<span class="why">Data issue</span>`;
+  if(!r.sameImg) return `<span class="why diff">Image diff</span>`;
+  return `<span class="why">${esc(a.raison_script)}</span>`;
+}
+
+function render(){
+  const vis = visible();
+  $("#list").innerHTML = vis.slice(0, shown).map(r => {
+    const a = r.a, s = a.carte_source, st = STATE[r.id];
+    const isDel = a.action === "SUPPRESSION";
+    const cls = st === true ? "approved" : st === false ? "rejected" : "pendingrow";
+    const cible = isDel ? a.carte_cible : null;
+    return `<tr class="row ${r.risk ? "risk" : ""} ${cls}">
+      <td>
+        <div class="item">${thumb(s)}
+          <div style="min-width:0">
+            <div class="num">${esc(s.id)}</div>
+            <div class="nm">${esc(s.nom)}</div>
+            <div class="mt">${esc(s.set_id)} · ${esc(s.rarete)} · ${esc(s.version)}</div>
+          </div></div>
+      </td>
+      <td>
+        <div class="act ${isDel ? "del" : "mv"}">${isDel ? "Delete" : "Reassign"}</div>
+        <div class="sub">${esc(a.raison_script)}</div>
+      </td>
+      <td>
+        <div class="sug">${isDel ? thumb(cible) : `<div class="noimg"></div>`}
+          <div style="min-width:0">
+            <div class="id">${isDel ? esc(cible.id) : esc(a.cible.nouvel_id)}</div>
+            <div class="sub">${isDel
+              ? `garder · ${esc(cible.set_id)} · ${esc(cible.rarete)}`
+              : `vers ${esc(a.cible.set_id)}`}</div>
+            ${r.sameImg ? `<div class="sameimg">même fichier image des deux côtés —
+              comparaison non discriminante</div>` : ""}
+          </div></div>
+      </td>
+      <td>
+        ${reasonTag(r)}
+        <div class="reasontxt">${esc((a.alertes && a.alertes[0]) || a.raison_detaillee)}</div>
+      </td>
+      <td><span class="stat ${st === true ? "yes" : st === false ? "no" : ""}">${
+        st === true ? "Approved" : st === false ? "Rejected" : "Review"}</span></td>
+      <td>
+        <div class="choice" data-id="${esc(r.id)}">
+          <button class="no ${st === false ? "on" : ""}">Reject</button>
+          <button class="yes ${st === true ? "on" : ""}">Approve</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="6"><div class="empty">Aucune entrée pour ce filtre</div></td></tr>`;
+
+  $("#list").querySelectorAll(".choice").forEach(box => {
+    const id = box.dataset.id;
+    box.querySelector(".yes").onclick = () => { STATE[id] = STATE[id] === true ? null : true; save(); render(); };
+    box.querySelector(".no").onclick  = () => { STATE[id] = STATE[id] === false ? null : false; save(); render(); };
+  });
+
+  $("#more").hidden = vis.length <= shown;
+  $("#more").textContent = `Afficher la suite (${vis.length - shown} restantes)`;
+
+  const yes = ROWS.filter(r => STATE[r.id] === true).length;
+  const no  = ROWS.filter(r => STATE[r.id] === false).length;
+  const pend= ROWS.filter(r => STATE[r.id] === null).length;
+  const del = ROWS.filter(r => r.a.action === "SUPPRESSION").length;
+  const mv  = ROWS.filter(r => r.a.action === "REASSIGNATION").length;
+  $("#stats").innerHTML =
+    `<div class="c"><div class="n">${ROWS.length}</div>
+       <div class="k label">Pending actions</div></div>
+     <div class="c"><div class="n del">${del}</div><div class="k label">Delete</div></div>
+     <div class="c"><div class="n">${mv}</div><div class="k label">Reassign</div></div>
+     <div class="tally">approved <b>${yes}</b><br>rejected <b>${no}</b><br>
+       <span class="a">to review <b>${pend}</b></span></div>
+     <span class="grow" style="flex:1"></span>
+     <div class="tally">shown <b>${Math.min(shown, vis.length)}</b> / ${vis.length}<br>
+       base <b>${DATA.etat_base_actuel.cartes}</b> cards<br>
+       <span title="date de génération du plan">calculé ${
+         esc((DATA.genere_le || "").replace("T", " ").slice(0, 16))}</span></div>`;
+}
+
+function renderAmbiguous(){
+  const amb = DATA.cas_ambigus || [];
+  if(!amb.length) return;
+  $("#ambig").innerHTML = `<div class="notice note">
+    <b>${amb.length} cas ambigu(s) — aucune action prévue par le script.</b>
+    cleanup.py les signale sans les traiter : ils ne sont ni supprimés ni déplacés, quoi que
+    vous cochiez. Ils restent en base et demandent un arbitrage manuel.
+    ${amb.map(a => `<div class="amb">${esc(a.id)} — ${esc(a.reason)}${a.bandai_sets
+      ? `<br>sets Bandai candidats : <b style="color:var(--text)">${
+          esc(a.bandai_sets.join(", "))}</b>` : ""}</div>`).join("")}
+  </div>`;
+}
+
+function exportSel(){
+  const app = ROWS.filter(r => STATE[r.id] === true);
+  const rej = ROWS.filter(r => STATE[r.id] === false);
+  const pend= ROWS.filter(r => STATE[r.id] === null);
+  if(pend.length && !confirm(
+      `${pend.length} entrée(s) ne sont pas tranchées ; elles seront EXCLUES de l'export `
+      + `(donc non appliquées). Continuer ?`)) return;
+
+  const out = {
+    genere_le: new Date().toISOString(),
+    source: "dashboard/cleanup-review.html",
+    resume: {
+      total: ROWS.length, approuvees: app.length,
+      rejetees: rej.length, non_tranchees: pend.length,
+      supprimer: app.filter(r => r.a.action === "SUPPRESSION").length,
+      reassigner: app.filter(r => r.a.action === "REASSIGNATION").length,
+    },
+    // consomme par : python scraper/cleanup.py --only-ids <ce fichier> --apply
+    approved_ids: app.map(r => r.id),
+    rejected_ids: rej.map(r => r.id),
+    non_tranchees_ids: pend.map(r => r.id),
+    detail_approuve: app.map(r => ({
+      id: r.id, action: r.a.action, raison: r.a.raison_script,
+      numero: r.a.carte_source.numero, nom: r.a.carte_source.nom,
+      set: r.a.carte_source.set_id,
+      cible: r.a.action === "SUPPRESSION" ? r.a.carte_cible.id : r.a.cible.nouvel_id,
+    })),
+  };
+  const blob = new Blob([JSON.stringify(out, null, 1)], {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "cleanup-approuve.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+</script>
+</body>
+</html>

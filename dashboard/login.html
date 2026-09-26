@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connexion — Ponéglyphe</title>
+<link rel="stylesheet" href="/dashboard/tanuki.css">
+<style>
+  body{height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .card{width:min(400px,100%)}
+  .brandline{display:flex;align-items:baseline;gap:10px;margin-bottom:6px}
+  .brandline .b{font-family:var(--display);font-size:30px;letter-spacing:.06em}
+  .brandline .s{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--muted);
+                text-transform:uppercase}
+  .lede{color:var(--muted2);font-size:13px;margin:0 0 22px;line-height:1.6}
+  form{border:1px solid var(--border);border-radius:3px;background:var(--surface);padding:20px}
+  .row{display:flex;gap:8px;margin-top:14px}
+  .row button{flex:1}
+  .err{border:1px solid #e8918c;color:#e8918c;border-radius:2px;padding:8px 10px;
+       font-family:var(--mono);font-size:11px;margin-top:13px;letter-spacing:.04em}
+  .foot{margin-top:16px;font-family:var(--mono);font-size:10.5px;color:var(--muted);
+        letter-spacing:.06em;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="card corners">
+  <div class="brandline"><span class="b">TANUKI</span><span class="s">/ OP-TCG API</span></div>
+  <p class="lede">Outil de contrôle interne. L'accès demande le mot de passe défini dans
+    <span class="mono">.env</span>.</p>
+
+  <form id="f" autocomplete="off">
+    <div class="field">
+      <label class="label" for="pw">Mot de passe</label>
+      <input type="password" id="pw" name="password" autofocus autocomplete="current-password">
+    </div>
+    <div class="row"><button type="submit" class="primary" id="go">Se connecter</button></div>
+    <div id="err"></div>
+  </form>
+
+  <div class="foot">
+    session valable 12 h · révoquée au redémarrage du serveur<br>
+    la garde est posée côté serveur, l'API refuse tout appel sans session
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const params = new URLSearchParams(location.search);
+
+$("#f").onsubmit = async e => {
+  e.preventDefault();
+  $("#err").innerHTML = "";
+  $("#go").disabled = true;
+  try{
+    const r = await fetch("/api/login", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({password: $("#pw").value}),
+    });
+    if(!r.ok){
+      const j = await r.json().catch(() => ({}));
+      throw new Error(j.error || ("HTTP " + r.status));
+    }
+    // le cookie de session est pose par le serveur (HttpOnly) : rien a stocker ici
+    location.replace(params.get("next") || "/dashboard/editor.html");
+  }catch(ex){
+    $("#err").innerHTML = `<div class="err">${
+      String(ex.message).replace(/[&<>"]/g, c =>
+        ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}</div>`;
+    $("#pw").value = ""; $("#pw").focus();
+  }finally{
+    $("#go").disabled = false;
+  }
+};
+</script>
+</body>
+</html>

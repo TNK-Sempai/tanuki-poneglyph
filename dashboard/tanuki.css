@@ -1,0 +1,279 @@
+/* ==========================================================================
+   Direction artistique Tanuki — dashboard Ponéglyphe
+   Neutre dominant, structure discrète, lime strictement réservé aux actions
+   principales, aux états actifs et aux indicateurs clés.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Instrument+Sans:wght@400;500;600&display=swap');
+
+:root{
+  --bg:#09090e;
+  --surface:#0e0e15;
+  --surface2:#13131c;
+  --border:rgba(255,255,255,0.06);
+  --border-strong:rgba(255,255,255,0.12);
+  --text:#ede8df;
+  --muted:#9a9490;
+  --muted2:#9c9590;
+  --accent:#c8f060;
+  --accent-dim:rgba(200,240,96,0.12);
+
+  --display:'Bebas Neue',Impact,sans-serif;
+  --serif:'DM Serif Display',Georgia,serif;
+  --mono:'DM Mono',ui-monospace,Consolas,monospace;
+  --sans:'Instrument Sans',ui-sans-serif,system-ui,sans-serif;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font:15px/1.55 var(--sans);
+  -webkit-font-smoothing:antialiased;
+}
+
+/* --- typographie ------------------------------------------------------- */
+
+.display{
+  font-family:var(--display);
+  font-weight:400;
+  letter-spacing:.02em;
+  line-height:.92;
+  text-transform:uppercase;
+}
+.editorial{font-family:var(--serif);font-style:italic;font-weight:400}
+
+.label{
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+.meta{font-family:var(--mono);font-size:11.5px;color:var(--muted2)}
+.mono{font-family:var(--mono)}
+
+a{color:var(--accent);text-decoration:none}
+
+/* --- chrome ------------------------------------------------------------ */
+
+.topbar{
+  display:flex;align-items:center;gap:14px;
+  padding:0 18px;height:54px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  white-space:nowrap;overflow-x:auto;overflow-y:hidden;
+}
+.topbar > *{flex:none}
+.topbar .cmd{flex:0 1 340px;min-width:190px}
+.topbar .status,.topbar .meta,.topbar .nav a{white-space:nowrap}
+.brand{
+  font-family:var(--display);font-size:21px;letter-spacing:.06em;
+  text-transform:uppercase;white-space:nowrap;
+}
+.brand span{color:var(--accent)}
+
+.nav{display:flex;gap:2px;align-items:center}
+.nav a{
+  font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);padding:6px 11px;border-bottom:1px solid transparent;
+}
+.nav a:hover{color:var(--text)}
+.nav a.on{color:var(--accent);border-bottom-color:var(--accent)}
+
+.grow{flex:1}
+
+/* --- champ de recherche, style commande -------------------------------- */
+
+.cmd{
+  display:flex;align-items:center;gap:9px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:3px;
+  padding:0 11px;height:32px;min-width:300px;
+}
+.cmd:focus-within{border-color:var(--accent)}
+.cmd .sigil{color:var(--muted);font-size:13px;line-height:1}
+.cmd input{
+  background:none;border:0;outline:none;color:var(--text);
+  font:12.5px/1 var(--mono);flex:1;padding:0;letter-spacing:.04em;
+}
+.cmd input::placeholder{color:var(--muted);letter-spacing:.12em;text-transform:uppercase;font-size:11px}
+.kbd{
+  font-family:var(--mono);font-size:10px;color:var(--muted);
+  border:1px solid var(--border);border-radius:2px;padding:2px 5px;letter-spacing:.06em;
+}
+
+/* --- boutons ----------------------------------------------------------- */
+
+button{
+  font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  background:none;color:var(--muted);
+  border:1px solid var(--border);border-radius:3px;
+  padding:7px 13px;cursor:pointer;white-space:nowrap;
+  transition:color .12s,border-color .12s,background-color .12s;
+}
+button:hover{color:var(--text);border-color:var(--border-strong)}
+button:disabled{opacity:.4;cursor:default}
+button.primary{
+  background:var(--accent);color:#0b0f04;border-color:var(--accent);font-weight:500;
+}
+button.primary:hover{background:#d4f778;color:#0b0f04}
+button.ghost{border-color:transparent}
+button.ghost:hover{border-color:var(--border)}
+button.quiet{color:var(--muted);border-color:transparent;opacity:0;transition:opacity .12s}
+.reveal:hover button.quiet{opacity:1}
+button.quiet:hover{color:#e8918c;border-color:rgba(232,145,140,.35)}
+
+/* --- filtres en ligne --------------------------------------------------- */
+
+.filters{display:flex;gap:0;flex-wrap:wrap;align-items:center}
+.filters button{
+  border:0;border-bottom:1px solid transparent;border-radius:0;
+  padding:5px 12px;background:none;
+}
+.filters button:hover{color:var(--text)}
+.filters button.on{color:var(--accent);border-bottom-color:var(--accent)}
+
+/* --- surfaces ----------------------------------------------------------- */
+
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:3px}
+.rule{height:1px;background:var(--border);border:0;margin:0}
+
+.stat .n{font-family:var(--display);font-size:62px;line-height:.86;letter-spacing:.01em}
+.stat .n.accent{color:var(--accent)}
+.stat .k{margin-top:7px}
+
+/* --- champs de formulaire ---------------------------------------------- */
+
+.field{margin-bottom:13px}
+.field > label{display:block;margin-bottom:5px}
+input[type=text],input[type=search],input[type=number],select,textarea{
+  width:100%;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:3px;
+  padding:7px 10px;
+  color:var(--text);
+  font:13.5px/1.4 var(--sans);
+}
+textarea{font-family:var(--mono);font-size:12.5px;min-height:70px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+/* neutralise le surlignage d'autofill de Chromium, qui repeint le champ en clair */
+input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{
+  -webkit-text-fill-color:var(--text);
+  -webkit-box-shadow:0 0 0 1000px var(--surface2) inset;
+  caret-color:var(--text);
+  transition:background-color 9999s ease-in-out 0s;
+}
+.hint{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:4px}
+
+/* --- section de fiche --------------------------------------------------- */
+
+.section{margin:0 0 20px}
+.section > .head{
+  display:flex;align-items:center;gap:11px;margin-bottom:12px;
+}
+.section > .head .line{flex:1;height:1px;background:var(--border)}
+
+/* --- divers ------------------------------------------------------------- */
+
+.tag{
+  font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--muted);border:1px solid var(--border);border-radius:2px;padding:2px 7px;
+}
+.tag.key{color:var(--accent);border-color:rgba(200,240,96,.3);background:var(--accent-dim)}
+
+.notice{
+  border:1px solid var(--border);border-left:2px solid var(--accent);
+  background:var(--surface);border-radius:3px;padding:12px 15px;
+  color:var(--muted2);font-size:13px;
+}
+.notice b{color:var(--text);font-weight:600}
+
+.empty{color:var(--muted);text-align:center;padding:56px 20px;font-family:var(--mono);font-size:12px;
+       letter-spacing:.08em;text-transform:uppercase}
+
+.toast{
+  position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:99;
+  background:var(--surface);border:1px solid var(--accent);color:var(--accent);
+  padding:10px 20px;border-radius:3px;
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;
+}
+.toast.bad{border-color:#e8918c;color:#e8918c}
+
+/* --- signatures visuelles ---------------------------------------------- */
+
+/* grain tres subtil, pose une fois sur le body */
+body:before{
+  content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+body > *{position:relative;z-index:2}
+
+/* eyebrow : ● 01 / SETS */
+.eyebrow{
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);
+}
+.eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex:none}
+.eyebrow .num{color:var(--accent)}
+.eyebrow .sep{color:var(--muted)}
+.eyebrow.on{color:var(--text)}
+
+/* corners decoratifs lime */
+.corners{position:relative}
+.corners:before,.corners:after{
+  content:"";position:absolute;width:9px;height:9px;pointer-events:none;
+  border-color:var(--accent);opacity:.55;
+}
+.corners:before{top:-1px;left:-1px;border-top:1px solid;border-left:1px solid}
+.corners:after{bottom:-1px;right:-1px;border-bottom:1px solid;border-right:1px solid}
+
+/* statut ● API ONLINE */
+.status{display:flex;align-items:center;gap:7px;
+        font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+        color:var(--muted)}
+.status .led{width:6px;height:6px;border-radius:50%;background:var(--accent);
+             box-shadow:0 0 6px rgba(200,240,96,.55)}
+.status.off .led{background:#e8918c;box-shadow:0 0 6px rgba(232,145,140,.5)}
+
+.chip{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;
+      border:1px solid var(--border-strong);border-radius:2px;padding:2px 7px;color:var(--muted)}
+
+/* titre numerote : 09 / THE NEW ERA */
+.numtitle{display:flex;align-items:baseline;gap:10px}
+.numtitle .n{font-family:var(--display);font-size:30px;color:var(--accent);line-height:1;
+             letter-spacing:.02em}
+.numtitle .sl{font-family:var(--display);font-size:26px;color:var(--muted);line-height:1}
+.numtitle .t{font-family:var(--display);font-size:30px;letter-spacing:.03em;line-height:1;
+             text-transform:uppercase}
+
+/* rangee dense LABEL -> valeur, pour les fiches */
+.rowfield{display:grid;grid-template-columns:118px 1fr;gap:10px;align-items:center;
+          padding:4px 0;border-bottom:1px solid transparent}
+.rowfield:hover{border-bottom-color:var(--border)}
+.rowfield > label{font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+                  text-transform:uppercase;color:var(--muted)}
+.rowfield input,.rowfield select{
+  background:none;border:0;border-bottom:1px solid transparent;border-radius:0;
+  padding:3px 0;color:var(--text);font:13px/1.35 var(--sans);width:100%;
+}
+.rowfield input:hover,.rowfield select:hover{border-bottom-color:var(--border)}
+.rowfield input:focus,.rowfield select:focus{border-bottom-color:var(--accent);outline:none}
+.rowfield textarea{
+  background:var(--surface2);border:1px solid var(--border);border-radius:2px;
+  font-family:var(--mono);font-size:11.5px;min-height:56px;padding:6px 8px;
+}
+.rowfield.tall{grid-template-columns:1fr;gap:5px;align-items:start}
+
+button.danger{color:#e8918c;border-color:rgba(232,145,140,.4)}
+button.danger:hover{color:#fff;background:#c2564f;border-color:#c2564f}
+
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#21212c;border-radius:0}
+::-webkit-scrollbar-thumb:hover{background:#2c2c38}
