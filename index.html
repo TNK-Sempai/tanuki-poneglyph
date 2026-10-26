@@ -5,108 +5,149 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tanuki-Poneglyph API</title>
 <meta name="description" content="API publique et gratuite des cartes One Piece Card Game en français : cartes, extensions et images, en JSON, sans clé.">
+<meta name="theme-color" content="#09090e">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,400..900&family=Hanken+Grotesk:wght@400;500;600&family=Martian+Mono:wdth,wght@75..112.5,300..500&display=swap">
 <style>
 :root{
-  --bg:#0e0e0e;
-  --surface:#161616;
-  --line:#2a2a2a;
-  --text:#f2f0ea;
-  --muted:#a3a19a;
-  --accent:#c8f060;
-  --accent-ink:#0e0e0e;
-  --string:#e6d9a8;
-  --number:#9fd4ff;
-  --display:'Bebas Neue',Impact,sans-serif;
-  --body:'DM Sans',system-ui,sans-serif;
-  --mono:'JetBrains Mono',ui-monospace,monospace;
+  color-scheme:dark;
+  --bg:#09090e;
+  --s1:#0e0e15;
+  --s2:#13131c;
+  --line:rgba(237,232,223,.09);
+  --line2:rgba(237,232,223,.16);
+  --ivory:#ede8df;
+  --muted:#9c9590;
+  --acc:#c8f060;
+  --ink:#09090e;
+  --str:#e6d9a8;
+  --num:#9fd4ff;
+  --f-display:'Anybody','Arial Narrow',Impact,sans-serif;
+  --f-body:'Hanken Grotesk','Helvetica Neue',Arial,sans-serif;
+  --f-mono:'Martian Mono',ui-monospace,Menlo,monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:17px;line-height:1.6}
-a{color:var(--accent);text-underline-offset:3px}
+body{margin:0;background:var(--bg);color:var(--ivory);font-family:var(--f-body);font-size:17px;line-height:1.6;overflow-x:hidden}
+a{color:var(--acc);text-underline-offset:3px}
 a:hover{color:#dff79a}
-:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
-header.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;padding:22px 0;border-bottom:1px solid var(--line)}
-.brand{font-family:var(--mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none}
-.brand b{color:var(--text);font-weight:500}
-nav.top-links{display:flex;gap:20px;font-size:15px}
-nav.top-links a{color:var(--text);text-decoration:none}
-nav.top-links a:hover{color:var(--accent)}
+:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+button{font:inherit;color:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px}
+.mono{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-variation-settings:"wdth" 85}
 
-.hero{padding:72px 0 56px;border-bottom:1px solid var(--line)}
-.hero h1{font-family:var(--display);font-weight:400;font-size:clamp(56px,10vw,132px);line-height:.9;letter-spacing:.01em;margin:0;max-width:11ch}
-.hero h1 em{font-style:normal;color:var(--accent)}
-.hero p.lead{font-size:clamp(18px,2.2vw,21px);color:var(--muted);max-width:56ch;margin:28px 0 0}
-.baseurl{margin-top:36px;display:flex;flex-wrap:wrap;align-items:stretch;gap:0;max-width:640px;border:1px solid var(--line);border-radius:6px;overflow:hidden}
-.baseurl code{flex:1 1 300px;min-width:0;font-family:var(--mono);font-size:15px;padding:14px 16px;background:var(--surface);overflow-x:auto;white-space:nowrap}
-.baseurl button{font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;background:var(--accent);color:var(--accent-ink);border:0;padding:0 20px;min-height:48px;cursor:pointer;font-weight:500}
+header.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px 24px;padding:20px 0;border-bottom:1px solid var(--line)}
+.brand{text-decoration:none;color:var(--ivory);display:flex;align-items:baseline;gap:12px}
+.brand b{font-family:var(--f-display);font-weight:800;font-variation-settings:"wdth" 130,"wght" 800;font-size:15px;letter-spacing:.14em}
+.brand span{color:var(--muted)}
+nav.links{display:flex;flex-wrap:wrap;gap:4px 22px}
+nav.links a{color:var(--ivory);text-decoration:none;padding:6px 0}
+nav.links a:hover{color:var(--acc)}
+
+.hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:40px;align-items:center;padding:64px 0 72px;border-bottom:1px solid var(--line)}
+.hero h1{font-family:var(--f-display);font-weight:800;font-variation-settings:"wdth" 62,"wght" 800;font-size:clamp(58px,8.6vw,124px);line-height:.88;letter-spacing:-.01em;text-transform:uppercase;margin:14px 0 0}
+.hero h1 em{font-style:normal;color:var(--acc);font-variation-settings:"wdth" 120,"wght" 800}
+.hero .lead{font-size:clamp(17px,1.9vw,20px);color:var(--muted);max-width:52ch;margin:26px 0 0}
+.baseurl{margin-top:30px;display:flex;flex-wrap:wrap;max-width:600px;border:1px solid var(--line2)}
+.baseurl code{flex:1 1 280px;min-width:0;font-family:var(--f-mono);font-size:13px;padding:15px 16px;background:var(--s1);overflow-x:auto;white-space:nowrap}
+.baseurl button{appearance:none;border:0;background:var(--acc);color:var(--ink);padding:0 20px;min-height:48px;cursor:pointer;font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
 .baseurl button:hover{background:#dff79a}
-.facts{display:flex;flex-wrap:wrap;gap:8px 28px;margin:28px 0 0;padding:0;list-style:none;font-size:15px;color:var(--muted)}
-.facts strong{font-family:var(--mono);font-weight:500;color:var(--text)}
+.facts{display:flex;flex-wrap:wrap;gap:10px 30px;margin:26px 0 0;padding:0;list-style:none;color:var(--muted);font-size:15px}
+.facts b{font-family:var(--f-display);font-weight:800;font-variation-settings:"wdth" 70,"wght" 800;font-size:30px;line-height:1;color:var(--ivory);display:block}
 
-section.block{padding:64px 0;border-bottom:1px solid var(--line)}
-.block-head{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:baseline;gap:8px 20px;margin-bottom:28px}
-.block-head p{grid-column:1 / -1}
-.block-head .num{font-family:var(--mono);font-size:13px;color:var(--accent)}
-.block-head h2{font-family:var(--display);font-weight:400;font-size:clamp(36px,5vw,52px);line-height:1;margin:0;letter-spacing:.02em}
-.block-head p{flex-basis:100%;margin:6px 0 0;color:var(--muted);max-width:62ch}
+.fan{position:relative;height:clamp(340px,40vw,500px)}
+.fan .c{position:absolute;left:50%;top:46%;width:clamp(120px,14vw,200px);aspect-ratio:600/838;border-radius:4.5%/3.2%;overflow:hidden;background:var(--s2);box-shadow:0 24px 50px -24px #000;transform-origin:50% 120%;transition:transform .7s var(--ease),opacity .5s}
+.fan .c img{width:100%;height:100%;object-fit:cover;display:block}
+.fan.dealt .c{opacity:1}
+.fan:hover .c{transition-duration:.45s}
+.fan-cap{position:absolute;left:0;right:0;bottom:0;margin:0;text-align:center;color:var(--muted);padding:0 12px}
+
+section.block{padding:72px 0;border-bottom:1px solid var(--line)}
+.bh{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:baseline;gap:6px 20px;margin-bottom:30px}
+.bh .no{color:var(--acc)}
+.bh h2{font-family:var(--f-display);font-weight:800;font-variation-settings:"wdth" 70,"wght" 800;font-size:clamp(40px,5.4vw,64px);line-height:.95;text-transform:uppercase;margin:0}
+.bh p{grid-column:1 / -1;margin:8px 0 0;color:var(--muted);max-width:64ch}
+
+.explorer-bar{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;margin-bottom:22px}
+.explorer-bar label{display:flex;flex-wrap:wrap;align-items:center;gap:10px;color:var(--muted);min-width:0;max-width:100%}
+.explorer-bar select{width:100%;min-width:0;text-overflow:ellipsis;appearance:none;background:var(--s1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23c8f060' stroke-width='1.6'/%3E%3C/svg%3E") no-repeat right 14px center;border:1px solid var(--line2);color:var(--ivory);font:inherit;font-size:15px;padding:12px 40px 12px 14px;min-height:48px;max-width:100%}
+.explorer-bar .req{font-family:var(--f-mono);font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.explorer-bar .req a{color:var(--ivory)}
+.explorer{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:28px;align-items:start}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:12px;max-height:780px;overflow-y:auto;padding:4px 6px 4px 2px;scrollbar-color:var(--line2) transparent}
+.grid button{appearance:none;border:0;padding:0;background:none;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:6px}
+.grid .th{aspect-ratio:600/838;border-radius:4.5%/3.2%;overflow:hidden;background:var(--s2);outline:2px solid transparent;outline-offset:2px;transition:transform .25s var(--ease),outline-color .2s}
+.grid .th img{width:100%;height:100%;object-fit:cover;display:block}
+.grid button:hover .th{transform:translateY(-4px)}
+.grid button[aria-pressed="true"] .th{outline-color:var(--acc)}
+.grid .lab{font-family:var(--f-mono);font-size:10px;letter-spacing:.06em;color:var(--muted);line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.grid .empty{grid-column:1 / -1;color:var(--muted);padding:24px 0}
+.detail{position:sticky;top:20px;display:flex;flex-direction:column;gap:14px}
+.detail .top2{display:grid;grid-template-columns:120px minmax(0,1fr);gap:16px;align-items:start}
+.detail .big{aspect-ratio:600/838;border-radius:4.5%/3.2%;overflow:hidden;background:var(--s2)}
+.detail .big img{width:100%;height:100%;object-fit:cover;display:block}
+.detail h3{font-family:var(--f-display);font-weight:800;font-variation-settings:"wdth" 80,"wght" 800;font-size:28px;line-height:1;margin:6px 0 8px;text-transform:uppercase}
+.detail .meta{color:var(--muted);font-size:14px;margin:0}
+.detail .path{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);overflow-wrap:anywhere;margin:0}
+.detail .path a{color:var(--ivory)}
+pre.json{margin:0;background:var(--s1);border:1px solid var(--line);padding:18px;font-family:var(--f-mono);font-size:12px;line-height:1.7;overflow:auto;max-height:520px;color:var(--ivory);font-variation-settings:"wdth" 90}
+.json .k{color:var(--muted)}
+.json .s{color:var(--str)}
+.json .n{color:var(--num)}
+.json .l{color:var(--acc)}
 
 .routes{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
-.routes li{display:grid;grid-template-columns:56px minmax(0,1.3fr) minmax(0,1fr) auto;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)}
-.routes .verb{font-family:var(--mono);font-size:12px;color:var(--muted)}
-.routes .path{font-family:var(--mono);font-size:15px;color:var(--text);overflow-wrap:anywhere}
-.routes .path span{color:var(--accent)}
-.routes .desc{color:var(--muted);font-size:15px}
-.routes a.open{font-family:var(--mono);font-size:13px;text-decoration:none;white-space:nowrap;padding:8px 0}
-.note{margin:20px 0 0;font-size:15px;color:var(--muted);max-width:70ch}
-
-.example{display:grid;grid-template-columns:minmax(0,260px) minmax(0,1fr);gap:32px;align-items:start}
-.example figure{margin:0}
-.example img{display:block;width:100%;aspect-ratio:600/838;object-fit:cover;border-radius:10px;background:var(--surface)}
-.example figcaption{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:10px;overflow-wrap:anywhere}
-.req{font-family:var(--mono);font-size:14px;margin:0 0 12px;color:var(--muted);overflow-wrap:anywhere}
-.req b{color:var(--text);font-weight:500}
-pre.json{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:20px;font-family:var(--mono);font-size:13.5px;line-height:1.65;overflow-x:auto;max-height:560px;color:var(--text)}
-.json .k{color:var(--muted)}
-.json .s{color:var(--string)}
-.json .n{color:var(--number)}
-.json .l{color:var(--accent)}
+.routes li{display:grid;grid-template-columns:52px minmax(0,1.2fr) minmax(0,1fr) auto;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)}
+.routes .v{color:var(--muted)}
+.routes .p{font-family:var(--f-mono);font-size:13.5px;overflow-wrap:anywhere}
+.routes .p span{color:var(--acc)}
+.routes .d{color:var(--muted);font-size:15px}
+.routes a{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;padding:8px 0;white-space:nowrap}
+.note{margin:20px 0 0;color:var(--muted);font-size:15px;max-width:72ch}
+code.i{font-family:var(--f-mono);font-size:13px;color:var(--ivory);overflow-wrap:anywhere}
 
 .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:40px}
-.two h3{font-size:18px;margin:0 0 8px}
+.two h3{font-size:18px;margin:0 0 8px;font-weight:600}
 .two p{margin:0 0 10px;color:var(--muted)}
-.two code,.inline{font-family:var(--mono);font-size:14px;color:var(--text);overflow-wrap:anywhere}
 
 .support{display:flex;flex-wrap:wrap;gap:24px;align-items:center;justify-content:space-between}
 .support p{margin:0;max-width:56ch;color:var(--muted)}
-.btn{display:inline-flex;align-items:center;min-height:48px;padding:0 22px;border-radius:6px;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-weight:700}
-.btn:hover{background:#dff79a;color:var(--accent-ink)}
+.btn{display:inline-flex;align-items:center;min-height:50px;padding:0 24px;background:var(--acc);color:var(--ink);text-decoration:none;font-family:var(--f-mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.btn:hover{background:#dff79a;color:var(--ink)}
 
 footer{padding:36px 0 56px;font-size:14px;color:var(--muted);display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
-footer a{color:var(--text)}
+footer a{color:var(--ivory)}
 
-@media (max-width:760px){
-  .routes li{grid-template-columns:44px minmax(0,1fr) auto;row-gap:4px}
-  .routes .desc{grid-column:2 / 4;grid-row:2}
-  .example{grid-template-columns:minmax(0,1fr)}
-  .example figure{max-width:220px}
+@media (max-width:900px){
+  .hero{grid-template-columns:minmax(0,1fr);padding:44px 0 56px}
+  .fan{height:330px;order:-1;overflow:hidden}
+  .fan .c{width:min(34vw,170px)}
+  .baseurl button{flex:1 1 100%}
+  .explorer{grid-template-columns:minmax(0,1fr)}
+  .detail{position:static}
+  .grid{max-height:560px}
+}
+@media (max-width:640px){
+  .routes li{grid-template-columns:40px minmax(0,1fr) auto;row-gap:4px}
+  .routes .d{grid-column:2 / 4;grid-row:2}
   .two{grid-template-columns:minmax(0,1fr);gap:28px}
-  .hero{padding:48px 0 40px}
-  section.block{padding:48px 0}
+  section.block{padding:52px 0}
+  .detail .top2{grid-template-columns:96px minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){
+  .fan .c,.grid .th{transition:none}
 }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="top">
-    <a class="brand" href="/"><b>Tanuki-Poneglyph</b> &middot; API v1</a>
-    <nav class="top-links" aria-label="Liens">
+    <a class="brand" href="/"><b>TANUKI-PONEGLYPH</b><span class="mono">API v1</span></a>
+    <nav class="links" aria-label="Sections">
+      <a href="#explorer">Explorer</a>
       <a href="#adresses">Adresses</a>
-      <a href="#exemple">Exemple</a>
       <a href="https://github.com/TNK-Sempai/tanuki-poneglyph">GitHub</a>
       <a href="#soutenir">Soutenir</a>
     </nav>
@@ -114,90 +155,74 @@ footer a{color:var(--text)}
 
   <main>
     <section class="hero" aria-labelledby="titre">
-      <h1 id="titre">Toutes les cartes One Piece, <em>en français.</em></h1>
-      <p class="lead">Une API publique et gratuite pour le One Piece Card Game : chaque carte, chaque version, chaque extension, avec ses textes officiels en français et son image. En JSON, sans clé, sans inscription.</p>
-
-      <div class="baseurl">
-        <code id="base">https://poneglyph.tanuki-corporation.com</code>
-        <button type="button" id="copy" aria-describedby="base">Copier</button>
+      <div>
+        <span class="mono" style="color:var(--acc)">One Piece Card Game · Base de données publique</span>
+        <h1 id="titre">Toutes les cartes One Piece, <em>en français.</em></h1>
+        <p class="lead">Chaque carte, chaque version, chaque extension, avec ses textes officiels en français et son image. En JSON, gratuit, sans clé et sans inscription.</p>
+        <div class="baseurl">
+          <code id="base">https://poneglyph.tanuki-corporation.com</code>
+          <button type="button" id="copy" aria-describedby="base">Copier</button>
+        </div>
+        <ul class="facts" aria-live="polite">
+          <li><b id="nb-cards">-</b>cartes</li>
+          <li><b id="nb-sets">-</b>extensions</li>
+          <li><b>0 €</b>sans clé API</li>
+        </ul>
       </div>
-
-      <ul class="facts" aria-live="polite">
-        <li><strong id="nb-cards">-</strong> cartes</li>
-        <li><strong id="nb-sets">-</strong> extensions</li>
-        <li>Gratuit, sans clé API</li>
-        <li>CORS ouvert</li>
-      </ul>
+      <div class="fan" id="fan" aria-hidden="true">
+        <p class="fan-cap mono" id="fan-cap"></p>
+      </div>
     </section>
 
-    <section class="block" id="adresses" aria-labelledby="h-adresses">
-      <div class="block-head">
-        <span class="num">01</span>
-        <h2 id="h-adresses">Adresses</h2>
-        <p>Toutes les réponses sont en JSON, en lecture seule, et peuvent être appelées directement depuis un navigateur ou un serveur.</p>
+    <section class="block" id="explorer" aria-labelledby="h-explorer">
+      <div class="bh">
+        <span class="no mono">01</span>
+        <h2 id="h-explorer">Explorer</h2>
+        <p>Choisissez une extension et cliquez sur une carte : vous voyez exactement ce que l'API renvoie pour elle. Tout est chargé en direct.</p>
       </div>
-      <ul class="routes">
-        <li>
-          <span class="verb">GET</span>
-          <span class="path">/v1/cards.json</span>
-          <span class="desc">Toutes les cartes, toutes versions confondues</span>
-          <a class="open" href="/v1/cards.json">Ouvrir</a>
-        </li>
-        <li>
-          <span class="verb">GET</span>
-          <span class="path">/v1/cards/<span>{id}</span>.json</span>
-          <span class="desc">Une carte, par son identifiant</span>
-          <a class="open" href="/v1/cards/OP16-001_standard_OP16.json">Ouvrir</a>
-        </li>
-        <li>
-          <span class="verb">GET</span>
-          <span class="path">/v1/sets.json</span>
-          <span class="desc">La liste des extensions et leur date de sortie</span>
-          <a class="open" href="/v1/sets.json">Ouvrir</a>
-        </li>
-        <li>
-          <span class="verb">GET</span>
-          <span class="path">/v1/sets/<span>{set_id}</span>.json</span>
-          <span class="desc">Une extension et toutes ses cartes</span>
-          <a class="open" href="/v1/sets/OP16.json">Ouvrir</a>
-        </li>
-        <li>
-          <span class="verb">GET</span>
-          <span class="path">/v1/filters.json</span>
-          <span class="desc">Les valeurs possibles : couleurs, types, raretés, affiliations</span>
-          <a class="open" href="/v1/filters.json">Ouvrir</a>
-        </li>
-        <li>
-          <span class="verb">GET</span>
-          <span class="path">/images/<span>{fichier}</span></span>
-          <span class="desc">L'image d'une carte, au chemin indiqué dans son champ <code class="inline">image</code></span>
-          <a class="open" href="/images/OP16-001_standard.webp">Ouvrir</a>
-        </li>
-      </ul>
-      <p class="note">L'identifiant d'une carte combine son numéro, sa version et son extension, par exemple <code class="inline">OP16-001_standard_OP16</code>. Une même carte en version alternative ou parallèle a donc son propre identifiant.</p>
-    </section>
-
-    <section class="block" id="exemple" aria-labelledby="h-exemple">
-      <div class="block-head">
-        <span class="num">02</span>
-        <h2 id="h-exemple">Exemple de réponse</h2>
-        <p>La réponse ci-dessous est chargée en direct depuis l'API.</p>
+      <div class="explorer-bar">
+        <label>Extension
+          <select id="set-select" aria-describedby="set-req"><option>Chargement...</option></select>
+        </label>
+        <span class="req" id="set-req"></span>
       </div>
-      <div class="example">
-        <figure>
-          <img id="ex-img" src="/images/OP16-001_standard.webp" alt="Carte OP16-001, Portgas D. Ace, Leader" width="600" height="838" loading="lazy">
-          <figcaption id="ex-cap">/images/OP16-001_standard.webp</figcaption>
-        </figure>
-        <div>
-          <p class="req"><b>GET</b> /v1/cards/OP16-001_standard_OP16.json</p>
-          <pre class="json" id="ex-json" tabindex="0" aria-label="Réponse JSON de l'exemple">Chargement de la réponse...</pre>
+      <div class="explorer">
+        <div class="grid" id="grid" aria-label="Cartes de l'extension"></div>
+        <div class="detail" id="detail" aria-live="polite">
+          <div class="top2">
+            <div class="big"><img id="d-img" alt="" width="600" height="838"></div>
+            <div>
+              <span class="mono" id="d-kicker" style="color:var(--acc)"></span>
+              <h3 id="d-name">Choisissez une carte</h3>
+              <p class="meta" id="d-meta"></p>
+            </div>
+          </div>
+          <p class="path" id="d-path"></p>
+          <pre class="json" id="d-json" tabindex="0" aria-label="Réponse JSON de la carte sélectionnée"></pre>
         </div>
       </div>
     </section>
 
+    <section class="block" id="adresses" aria-labelledby="h-adresses">
+      <div class="bh">
+        <span class="no mono">02</span>
+        <h2 id="h-adresses">Adresses</h2>
+        <p>Toutes les réponses sont en JSON, en lecture seule, appelables directement depuis un navigateur ou un serveur. CORS ouvert.</p>
+      </div>
+      <ul class="routes">
+        <li><span class="v mono">GET</span><span class="p">/v1/cards.json</span><span class="d">Toutes les cartes, toutes versions confondues</span><a href="/v1/cards.json">Ouvrir</a></li>
+        <li><span class="v mono">GET</span><span class="p">/v1/cards/<span>{id}</span>.json</span><span class="d">Une carte, par son identifiant</span><a href="/v1/cards/OP16-001_standard_OP16.json">Ouvrir</a></li>
+        <li><span class="v mono">GET</span><span class="p">/v1/sets.json</span><span class="d">La liste des extensions et leur date de sortie</span><a href="/v1/sets.json">Ouvrir</a></li>
+        <li><span class="v mono">GET</span><span class="p">/v1/sets/<span>{set_id}</span>.json</span><span class="d">Une extension et toutes ses cartes</span><a href="/v1/sets/OP16.json">Ouvrir</a></li>
+        <li><span class="v mono">GET</span><span class="p">/v1/filters.json</span><span class="d">Les valeurs possibles : couleurs, types, raretés, affiliations</span><a href="/v1/filters.json">Ouvrir</a></li>
+        <li><span class="v mono">GET</span><span class="p">/images/<span>{fichier}</span></span><span class="d">L'image d'une carte, au chemin donné par son champ <code class="i">image</code></span><a href="/images/OP16-001_standard.webp">Ouvrir</a></li>
+      </ul>
+      <p class="note">L'identifiant d'une carte combine son numéro, sa version et son extension, par exemple <code class="i">OP16-001_standard_OP16</code>. Une même carte en version alternative ou parallèle a donc son propre identifiant.</p>
+    </section>
+
     <section class="block" id="mentions" aria-labelledby="h-mentions">
-      <div class="block-head">
-        <span class="num">03</span>
+      <div class="bh">
+        <span class="no mono">03</span>
         <h2 id="h-mentions">Données et mentions</h2>
       </div>
       <div class="two">
@@ -208,15 +233,15 @@ footer a{color:var(--text)}
         </div>
         <div>
           <h3>Mentions légales</h3>
-          <p>One Piece Card Game &copy; Eiichiro Oda / Shueisha, Toei Animation, &copy; Bandai. Les noms, textes et visuels des cartes appartiennent à leurs ayants droit.</p>
-          <p>Tanuki-Poneglyph est un projet communautaire non officiel, sans affiliation avec Bandai. Le code est publié sous licence MIT.</p>
+          <p>ONE PIECE CARD GAME &copy; Eiichiro Oda / Shueisha, Toei Animation &copy; Bandai. Les noms, textes et visuels des cartes appartiennent à leurs ayants droit.</p>
+          <p>Tanuki-Poneglyph est un projet communautaire non officiel, sans affiliation avec Bandai, Shueisha ou Toei Animation. Le code est publié sous licence MIT.</p>
         </div>
       </div>
     </section>
 
     <section class="block" id="soutenir" aria-labelledby="h-soutenir">
-      <div class="block-head">
-        <span class="num">04</span>
+      <div class="bh">
+        <span class="no mono">04</span>
         <h2 id="h-soutenir">Soutenir le projet</h2>
       </div>
       <div class="support">
@@ -234,48 +259,122 @@ footer a{color:var(--text)}
 
 <script>
 (function () {
-  var base = document.getElementById('base').textContent.trim();
-  var btn = document.getElementById('copy');
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var fmt = new Intl.NumberFormat('fr-BE');
+  function $(id) { return document.getElementById(id); }
+  function getJSON(u) { return fetch(u).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }); }
+
+  /* copier l'adresse */
+  var btn = $('copy');
   btn.addEventListener('click', function () {
-    var done = function () {
+    if (!navigator.clipboard) return;
+    navigator.clipboard.writeText($('base').textContent.trim()).then(function () {
       btn.textContent = 'Copié';
       setTimeout(function () { btn.textContent = 'Copier'; }, 1600);
-    };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(base).then(done, function () {});
-    }
+    }, function () {});
   });
 
-  var fmt = new Intl.NumberFormat('fr-BE');
-  fetch('/v1/filters.json').then(function (r) { return r.ok ? r.json() : null; }).then(function (f) {
-    if (!f) return;
-    if (typeof f.total_cards === 'number') document.getElementById('nb-cards').textContent = fmt.format(f.total_cards);
-    var sets = f.sets || f.set_ids || f.set;
-    if (Array.isArray(sets)) document.getElementById('nb-sets').textContent = fmt.format(sets.length);
+  /* compteurs */
+  getJSON('/v1/filters.json').then(function (f) {
+    if (typeof f.total_cards === 'number') $('nb-cards').textContent = fmt.format(f.total_cards);
+    if (Array.isArray(f.sets)) $('nb-sets').textContent = fmt.format(f.sets.length);
   }).catch(function () {});
 
-  function esc(s) {
-    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-  function highlight(json) {
+  /* coloration JSON */
+  function esc(s) { return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function hl(json) {
     return esc(json).replace(/("(?:\\.|[^"\\])*")(\s*:)?|\b(true|false|null)\b|-?\b\d+(?:\.\d+)?\b/g, function (m, str, colon, lit) {
       if (str) return colon ? '<span class="k">' + str + '</span>' + colon : '<span class="s">' + str + '</span>';
       if (lit) return '<span class="l">' + m + '</span>';
       return '<span class="n">' + m + '</span>';
     });
   }
-  var pre = document.getElementById('ex-json');
-  fetch('/v1/cards/OP16-001_standard_OP16.json').then(function (r) {
-    if (!r.ok) throw new Error(r.status);
-    return r.json();
-  }).then(function (card) {
-    pre.innerHTML = highlight(JSON.stringify(card, null, 2));
-    if (card.image) {
-      document.getElementById('ex-img').src = card.image;
-      document.getElementById('ex-cap').textContent = card.image;
-    }
+
+  /* éventail de cartes du héros */
+  function deal(cards, setName) {
+    var fan = $('fan');
+    var n = cards.length, mid = (n - 1) / 2;
+    cards.forEach(function (c, i) {
+      var el = document.createElement('div');
+      el.className = 'c';
+      var img = document.createElement('img');
+      img.src = c.image; img.alt = ''; img.width = 600; img.height = 838;
+      el.appendChild(img);
+      var spread = Math.min(34, fan.clientWidth / 14);
+      var rot = (i - mid) * 9, x = (i - mid) * spread, y = Math.abs(i - mid) * 10;
+      var end = 'translate(-50%,-50%) translate(' + x + 'px,' + y + 'px) rotate(' + rot + 'deg)';
+      el.style.zIndex = String(i);
+      if (reduce) { el.style.transform = end; }
+      else {
+        el.style.opacity = '0';
+        el.style.transform = 'translate(-50%,-50%) translate(0,60px) rotate(0deg)';
+        setTimeout(function () { el.style.opacity = '1'; el.style.transform = end; }, 120 + i * 110);
+      }
+      fan.insertBefore(el, $('fan-cap'));
+    });
+    $('fan-cap').textContent = setName;
+  }
+
+  /* explorateur */
+  var grid = $('grid'), sel = $('set-select'), current = null;
+  function showCard(card, btnEl) {
+    [].forEach.call(grid.querySelectorAll('button[aria-pressed="true"]'), function (b) { b.setAttribute('aria-pressed', 'false'); });
+    if (btnEl) btnEl.setAttribute('aria-pressed', 'true');
+    $('d-img').src = card.image || '';
+    $('d-img').alt = card.image ? card.name + ', ' + card.card_number : '';
+    $('d-kicker').textContent = card.card_number + ' · ' + card.version;
+    $('d-name').textContent = card.name;
+    $('d-meta').textContent = [card.type, (card.colors || []).join(' / '), card.rarity].filter(Boolean).join(' · ');
+    var url = '/v1/cards/' + encodeURIComponent(card.id) + '.json';
+    $('d-path').innerHTML = 'GET <a href="' + url + '">' + esc('/v1/cards/' + card.id + '.json') + '</a>';
+    $('d-json').innerHTML = hl(JSON.stringify(card, null, 2));
+  }
+  function loadSet(id) {
+    grid.innerHTML = '<p class="empty">Chargement...</p>';
+    $('set-req').innerHTML = 'GET <a href="/v1/sets/' + encodeURIComponent(id) + '.json">/v1/sets/' + esc(id) + '.json</a>';
+    return getJSON('/v1/sets/' + encodeURIComponent(id) + '.json').then(function (s) {
+      current = s;
+      var cards = s.cards || [];
+      grid.innerHTML = '';
+      if (!cards.length) { grid.innerHTML = '<p class="empty">Aucune carte dans cette extension.</p>'; return s; }
+      cards.forEach(function (c, i) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.setAttribute('aria-pressed', 'false');
+        b.innerHTML = '<span class="th"><img loading="lazy" width="600" height="838" alt=""></span><span class="lab"></span>';
+        if (c.image) b.querySelector('img').src = c.image;
+        b.querySelector('img').alt = c.name + ', ' + c.card_number + ', ' + c.version;
+        b.querySelector('.lab').textContent = c.card_number + ' ' + c.name;
+        b.addEventListener('click', function () { showCard(c, b); });
+        grid.appendChild(b);
+      });
+      var first = cards.filter(function (c) { return c.type === 'LEADER' && c.image; })[0] || cards[0];
+      showCard(first, grid.children[cards.indexOf(first)]);
+      return s;
+    }).catch(function () {
+      grid.innerHTML = '<p class="empty">Impossible de charger cette extension.</p>';
+    });
+  }
+
+  getJSON('/v1/sets.json').then(function (sets) {
+    var today = new Date().toISOString().slice(0, 10);
+    sets = sets.filter(function (s) { return !s.release_date || s.release_date <= today; })
+      .sort(function (a, b) { return (b.release_date || '').localeCompare(a.release_date || ''); });
+    sel.innerHTML = sets.map(function (s) {
+      return '<option value="' + esc(s.set_id) + '">' + esc(s.set_id + ' · ' + s.name) + '</option>';
+    }).join('');
+    var main = sets.filter(function (s) { return s.set_type === 'OP'; })[0] || sets[0];
+    if (!main) return;
+    sel.value = main.set_id;
+    sel.addEventListener('change', function () { loadSet(sel.value); });
+    loadSet(main.set_id).then(function (s) {
+      if (!s || !s.cards) return;
+      var pick = s.cards.filter(function (c) { return c.type === 'LEADER' && c.image && c.version === 'Standard'; });
+      if (pick.length < 3) pick = s.cards.filter(function (c) { return c.image && c.type !== 'DON!!'; });
+      deal(pick.slice(0, 5), s.set_id + ' · ' + s.name);
+    });
   }).catch(function () {
-    pre.textContent = 'La réponse n\'a pas pu être chargée. Ouvrez /v1/cards/OP16-001_standard_OP16.json pour la voir.';
+    sel.innerHTML = '<option>Indisponible</option>';
+    grid.innerHTML = '<p class="empty">Les extensions n\'ont pas pu être chargées.</p>';
   });
 })();
 </script>
