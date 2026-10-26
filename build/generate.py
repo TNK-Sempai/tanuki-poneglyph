@@ -178,10 +178,14 @@ def main() -> int:
     dist_images.mkdir(parents=True, exist_ok=True)
     copied = 0
     if IMAGES_SRC.exists():
-        for img in IMAGES_SRC.glob("*.webp"):
-            shutil.copy2(img, dist_images / img.name)
-            copied += 1
+        for img in IMAGES_SRC.iterdir():
+            if img.suffix.lower() in {".webp", ".png", ".jpg", ".jpeg"}:
+                shutil.copy2(img, dist_images / img.name)
+                copied += 1
     log.info("%d images copiées vers dist/images/", copied)
+
+    # Page d'accueil de l'API
+    shutil.copy2(REPO_ROOT / "index.html", DIST / "index.html")
 
     # Données embarquées en statique dans le Worker
     WORKER_DATA.mkdir(parents=True, exist_ok=True)
